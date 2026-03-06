@@ -87,5 +87,20 @@ export const updateStudent = async (id: any, data: any) => {
     return response.data;
 };
 
+export const getProfile = async () => {
+    const response = await api.get('profile.php');
+    return response.data;
+};
+
+export const updateProfile = async (data: any) => {
+    const response = await api.post('profile.php', data);
+    return response.data;
+};
+
+export const changePassword = async (data: any) => {
+    const response = await api.post('profile.php?action=change_password', data);
+    return response.data;
+};
+
 
 

@@ -7,7 +7,7 @@ import * as Sharing from 'expo-sharing';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function CollectFeeScreen() {
-    const params = useLocalSearchParams();
+    const { student_id, name: student_param_name } = useLocalSearchParams();
     const [students, setStudents] = useState<any[]>([]);
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [amount, setAmount] = useState('');
@@ -24,12 +24,15 @@ export default function CollectFeeScreen() {
         getCategories().then(res => {
             if (res.status) setCategories(res.data);
         });
+    }, []);
 
-        if (params.student_id) {
-            setSelectedStudent({ id: params.student_id, name: params.name });
-            setSearch(params.name as string);
+    useEffect(() => {
+        if (student_id) {
+            setSelectedStudent({ id: student_id, name: student_param_name });
+            setSearch(student_param_name as string);
         }
-    }, [params]);
+    }, [student_id, student_param_name]);
+
 
 
     const searchStudents = async (query: string) => {

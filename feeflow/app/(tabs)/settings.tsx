@@ -93,7 +93,7 @@ export default function SettingsScreen() {
 
                     <View style={styles.sectionCard}>
                         <Text style={styles.sectionTitle}>Institute Settings</Text>
-                        <TouchableOpacity style={styles.menuItem}>
+                        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/update-profile')}>
                             <View style={[styles.iconBox, { backgroundColor: '#eff6ff' }]}>
                                 <Ionicons name="document-text" size={20} color="#3b82f6" />
                             </View>
@@ -101,11 +101,11 @@ export default function SettingsScreen() {
                             <Ionicons name="chevron-forward" size={18} color="#cbd5e1" />
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.menuItem}>
+                        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/change-password')}>
                             <View style={[styles.iconBox, { backgroundColor: '#fdf4ff' }]}>
                                 <Ionicons name="shield-checkmark" size={20} color="#a855f7" />
                             </View>
-                            <Text style={styles.menuText}>Security & PIN</Text>
+                            <Text style={styles.menuText}>Security & Password</Text>
                             <Ionicons name="chevron-forward" size={18} color="#cbd5e1" />
                         </TouchableOpacity>
                     </View>
