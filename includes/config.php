@@ -2,12 +2,24 @@
 // config.php
 session_start();
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'feeflow_db');
+// detect environment
+if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['HTTP_HOST'] == '127.0.0.1') {
+    // Local Settings
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'root');
+    define('DB_PASS', '');
+    define('DB_NAME', 'feeflow_db');
+    define('BASE_URL', 'http://localhost/feeflow/');
+}
+else {
+    // Live Server Settings
+    define('DB_HOST', 'localhost');
+    define('DB_USER', 'u960515621_feeflow');
+    define('DB_PASS', '@Flow_2001');
+    define('DB_NAME', 'u960515621_feeflow');
+    define('BASE_URL', 'https://feeflow.offerplant.com/');
+}
 
-define('BASE_URL', 'http://localhost/feeflow/');
 define('SITE_NAME', 'FeeFlow');
 
 // Connect to Database
