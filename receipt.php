@@ -170,137 +170,155 @@ $primary_color = $fee['receipt_color'] ?: '#003366'; // Defaulting to a deep aca
         .btn-primary { background: var(--primary); color: white; }
         .btn-secondary { background: #e2e8f0; color: #475569; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
     <div class="no-print">
         <div style="display: flex; gap: 10px; align-items: center;">
-            <button onclick="window.print()" class="btn btn-primary">Download / Print Receipt</button>
+            <button onclick="window.print()" class="btn btn-secondary">Print Receipt</button>
+            <button onclick="downloadPDF()" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download PDF</button>
             <a href="collect_fee.php" class="btn btn-secondary">New Collection</a>
-            <a href="reports.php" class="btn btn-secondary">All Receipts</a>
+            <a href="all_receipts.php" class="btn btn-secondary">All Receipts</a>
         </div>
         <br>
         <div style="font-size: 12px; color: #666;">
-            <b>Tip:</b> Set layout to Portrait and remove headers/footers in print settings.
+            <b>Tip:</b> If downloading PDF, wait for images to load. Set layout to Portrait for best results.
         </div>
     </div>
 
-    <div class="page">
-        <div class="receipt-card">
-            <!-- Header Section -->
-            <div class="header">
-                <?php if ($fee['inst_logo']): ?>
-                    <img src="assets/img/logos/<?php echo $fee['inst_logo']; ?>" class="header-logo">
-                <?php
+    <div id="receipt-content">
+        <div class="page">
+            <div class="receipt-card">
+                <!-- Header Section -->
+                <div class="header">
+                    <?php if ($fee['inst_logo']): ?>
+                        <img src="assets/img/logos/<?php echo $fee['inst_logo']; ?>" class="header-logo">
+                    <?php
 else: ?>
-                    <div style="width: 100px; height: 100px; border: 1px solid #eee; display: grid; place-items: center; font-size: 10px;">LOGO</div>
-                <?php
+                        <div style="width: 100px; height: 100px; border: 1px solid #eee; display: grid; place-items: center; font-size: 10px;">LOGO</div>
+                    <?php
 endif; ?>
-                
-                <div class="header-text">
-                    <h1 class="inst-name"><?php echo $fee['inst_name']; ?></h1>
-                    <p class="inst-details"><?php echo $fee['inst_address']; ?></p>
-                    <p class="inst-sub">
-                        <?php if ($fee['recognition_text'])
+                    
+                    <div class="header-text">
+                        <h1 class="inst-name"><?php echo $fee['inst_name']; ?></h1>
+                        <p class="inst-details"><?php echo $fee['inst_address']; ?></p>
+                        <p class="inst-sub">
+                            <?php if ($fee['recognition_text'])
     echo $fee['recognition_text'] . "<br>"; ?>
-                        <?php if ($fee['affiliation_text'])
+                            <?php if ($fee['affiliation_text'])
     echo "<b>" . $fee['affiliation_text'] . "</b>"; ?>
-                    </p>
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <hr style="border: 0; border-top: 2px solid var(--primary); margin: 0 0 15px 0;">
+                <hr style="border: 0; border-top: 2px solid var(--primary); margin: 0 0 15px 0;">
 
-            <!-- Receipt Metadata Bar -->
-            <div class="receipt-bar">
-                <span>Receipt No : <?php echo $fee['receipt_no']; ?></span>
-                <span style="text-align: right;">Date: <?php echo date('d-m-Y', strtotime($fee['payment_date'])); ?></span>
-            </div>
-
-            <!-- Student Detail Grid -->
-            <div class="student-info">
-                <span class="info-label">Student Name</span>
-                <span class="info-value">: <?php echo strtoupper($fee['student_name']); ?></span>
-                
-                <span class="info-label">Father's Name</span>
-                <span class="info-value">: <?php echo strtoupper($fee['parent_name']); ?></span>
-                
-                <span class="info-label">Course</span>
-                <span class="info-value">: <?php echo strtoupper($fee['class_name']); ?></span>
-                
-                <span class="info-label">Session</span>
-                <span class="info-value">: <?php echo strtoupper($fee['session'] ?: 'N/A'); ?></span>
-                
-                <span class="info-label">Admission No.</span>
-                <span class="info-value">: <?php echo strtoupper($fee['roll_no'] ?: 'N/A'); ?></span>
-            </div>
-
-            <!-- Particulars Table -->
-            <table class="particulars-table">
-                <thead>
-                    <tr>
-                        <th style="width: 10%; text-align: center;">S.No</th>
-                        <th style="text-align: left;">Particulars</th>
-                        <th style="width: 25%; text-align: right;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td><?php echo $fee['category_name'] ?: $fee['custom_fee_name']; ?></td>
-                        <td style="text-align: right;">₹<?php echo number_format($fee['amount'], 2); ?></td>
-                    </tr>
-                    <!-- Dynamic empty rows to fill space matching image feel -->
-                    <tr style="height: 40px;"><td></td><td></td><td></td></tr>
-                    <tr class="total-row">
-                        <td colspan="2" style="text-align: right; text-transform: uppercase;">Total</td>
-                        <td style="text-align: right;">₹<?php echo number_format($fee['amount'], 2); ?></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Payment Details Section -->
-            <div class="footer-info">
-                <div class="line">
-                    <strong>Payment Mode</strong> : <?php echo $fee['payment_method']; ?>
+                <!-- Receipt Metadata Bar -->
+                <div class="receipt-bar">
+                    <span>Receipt No : <?php echo $fee['receipt_no']; ?></span>
+                    <span style="text-align: right;">Date: <?php echo date('d-m-Y', strtotime($fee['payment_date'])); ?></span>
                 </div>
-                <div class="line">
-                    <strong>On Account Of</strong> : <?php echo $fee['category_name'] ?: $fee['custom_fee_name']; ?>
-                </div>
-                <div class="words-box">
-                    Amount (in words) : <span style="text-transform: capitalize;"><?php echo amount_in_words($fee['amount']); ?> Only</span>
-                </div>
-            </div>
 
-            <!-- Final Footer Section -->
-            <div class="final-footer">
-                <div class="qr-box">
-                   <?php
+                <!-- Student Detail Grid -->
+                <div class="student-info">
+                    <span class="info-label">Student Name</span>
+                    <span class="info-value">: <?php echo strtoupper($fee['student_name']); ?></span>
+                    
+                    <span class="info-label">Father's Name</span>
+                    <span class="info-value">: <?php echo strtoupper($fee['parent_name']); ?></span>
+                    
+                    <span class="info-label">Course</span>
+                    <span class="info-value">: <?php echo strtoupper($fee['class_name'] ?: 'N/A'); ?></span>
+                    
+                    <span class="info-label">Session</span>
+                    <span class="info-value">: <?php echo strtoupper($fee['session'] ?: 'N/A'); ?></span>
+                    
+                    <span class="info-label">Admission No.</span>
+                    <span class="info-value">: <?php echo strtoupper($fee['roll_no'] ?: 'N/A'); ?></span>
+                </div>
+
+                <!-- Particulars Table -->
+                <table class="particulars-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%; text-align: center;">S.No</th>
+                            <th style="text-align: left;">Particulars</th>
+                            <th style="width: 25%; text-align: right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td><?php echo $fee['category_name'] ?: ($fee['custom_fee_name'] ?: 'Fee Payment'); ?></td>
+                            <td style="text-align: right;">₹<?php echo number_format($fee['amount'], 2); ?></td>
+                        </tr>
+                        <!-- Dynamic empty rows to fill space matching image feel -->
+                        <tr style="height: 40px;"><td></td><td></td><td></td></tr>
+                        <tr class="total-row">
+                            <td colspan="2" style="text-align: right; text-transform: uppercase;">Total</td>
+                            <td style="text-align: right;">₹<?php echo number_format($fee['amount'], 2); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Payment Details Section -->
+                <div class="footer-info">
+                    <div class="line">
+                        <strong>Payment Mode</strong> : <?php echo $fee['payment_method']; ?>
+                    </div>
+                    <div class="line">
+                        <strong>On Account Of</strong> : <?php echo $fee['category_name'] ?: ($fee['custom_fee_name'] ?: 'Fee Payment'); ?>
+                    </div>
+                    <div class="words-box">
+                        Amount (in words) : <span style="text-transform: capitalize;"><?php echo amount_in_words($fee['amount']); ?> Only</span>
+                    </div>
+                </div>
+
+                <!-- Final Footer Section -->
+                <div class="final-footer">
+                    <div class="qr-box">
+                        <?php
 $verify_data = BASE_URL . "student_ledger.php?id=" . $fee['student_id'];
-
 $v_qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($verify_data);
 ?>
-                    <img src="<?php echo $v_qr_url; ?>" alt="Verify QR">
-                    <p>Scan to Verify Receipt</p>
-                </div>
+                        <img src="<?php echo $v_qr_url; ?>" alt="Verify QR">
+                        <p>Scan to Verify Receipt</p>
+                    </div>
 
-                <div class="signature-box">
-                    <?php if ($fee['signature_data']): ?>
-                        <img src="<?php echo $fee['signature_data']; ?>" class="sig-image">
-                    <?php
+                    <div class="signature-box">
+                        <?php if ($fee['signature_data']): ?>
+                            <img src="<?php echo $fee['signature_data']; ?>" class="sig-image">
+                        <?php
 else: ?>
-                        <div style="height: 50px;"></div>
-                    <?php
+                            <div style="height: 50px;"></div>
+                        <?php
 endif; ?>
-                    <div class="sig-line">Authorized Signature</div>
+                        <div class="sig-line">Authorized Signature</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="generated-tag">
-                This is a Computer Generated Receipt
+                <div class="generated-tag">
+                    This is a Computer Generated Receipt
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+    function downloadPDF() {
+        const element = document.getElementById('receipt-content');
+        const options = {
+            margin:       0,
+            filename:     'Receipt_<?php echo $fee['receipt_no']; ?>.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(options).from(element).save();
+    }
+    </script>
 
 </body>
 </html>
+

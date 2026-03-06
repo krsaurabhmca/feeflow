@@ -19,7 +19,7 @@ if (!$student)
     die("Student not found");
 
 $qr_data = BASE_URL . "student_ledger.php?id=" . $student['id'];
-$qr_url = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" . urlencode($qr_data) . "&choe=UTF-8";
+$qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($qr_data);
 $theme_color = $student['receipt_color'] ?: '#dc2626';
 ?>
 <!DOCTYPE html>
@@ -41,7 +41,7 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
         /* ID Card Professional Design */
         .id-card { 
             width: 320px; 
-            height: 500px; 
+            height: 520px; 
             background: white; 
             border-radius: 20px; 
             overflow: hidden; 
@@ -50,7 +50,7 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
             border: 1px solid #eee;
         }
         .card-header { 
-            height: 140px; 
+            height: 160px; 
             background: var(--p); 
             color: white; 
             padding: 20px; 
@@ -58,15 +58,16 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            padding-top: 30px;
         }
-        .card-header img { max-height: 50px; margin-bottom: 8px; filter: brightness(0) invert(1); }
-        .card-header h3 { margin: 0; font-size: 1.1rem; line-height: 1.2; font-weight: 800; }
+        .card-header img { max-height: 55px; max-width: 80%; margin-bottom: 10px; filter: brightness(0) invert(1); }
+        .card-header h3 { margin: 0; font-size: 1.1rem; line-height: 1.2; font-weight: 800; text-transform: uppercase; }
         
         .photo-container { 
-            width: 130px; 
-            height: 130px; 
-            margin: -65px auto 10px; 
+            width: 120px; 
+            height: 120px; 
+            margin: -60px auto 10px; 
             position: relative; 
             z-index: 2;
         }
@@ -76,7 +77,7 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
             background: white; 
             border-radius: 50%; 
             padding: 5px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
         }
         .photo-box img, .photo-box .placeholder { 
             width: 100%; 
@@ -92,23 +93,23 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
         }
 
         .student-details { text-align: center; padding: 0 20px; margin-top: 5px; }
-        .student-details h2 { margin: 0; color: #0f172a; font-size: 1.4rem; font-weight: 800; }
-        .student-details p.class { color: var(--p); font-weight: 700; font-size: 0.9rem; margin: 4px 0 15px; }
+        .student-details h2 { margin: 0; color: #0f172a; font-size: 1.4rem; font-weight: 800; text-transform: uppercase; }
+        .student-details p.class { color: var(--p); font-weight: 700; font-size: 0.9rem; margin: 4px 0 15px; background: rgba(0,0,0,0.05); display: inline-block; padding: 2px 10px; border-radius: 20px; }
         
         .info-grid { 
             display: grid; 
             grid-template-columns: 1fr; 
-            gap: 8px; 
+            gap: 10px; 
             text-align: left; 
-            padding: 0 30px;
+            padding: 0 35px;
             font-size: 0.85rem;
         }
-        .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
-        .info-row strong { color: #64748b; font-weight: 600; }
+        .info-row { display: flex; justify-content: space-between; border-bottom: 1px dotted #e2e8f0; padding-bottom: 5px; }
+        .info-row strong { color: #64748b; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
         .info-row span { color: #1e293b; font-weight: 700; }
 
-        .qr-section { margin-top: 25px; text-align: center; }
-        .qr-section img { width: 90px; border: 1px solid #eee; border-radius: 12px; padding: 5px; background: white; }
+        .qr-section { margin-top: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .qr-section img { width: 85px; border: 1px solid #f1f5f9; border-radius: 10px; padding: 4px; background: white; }
         
         .card-footer { 
             position: absolute; 
@@ -120,6 +121,7 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
             text-align: center; 
             font-size: 0.7rem; 
             font-weight: 600;
+            letter-spacing: 1px;
         }
         
         @media print { .no-print { display: none; } body { padding: 0; background: white; } }
@@ -129,6 +131,7 @@ $theme_color = $student['receipt_color'] ?: '#dc2626';
     <div class="no-print">
         <button onclick="downloadID('png')" class="btn btn-secondary"><i class="fas fa-image"></i> Download PNG</button>
         <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print"></i> Print ID Card</button>
+        <button onclick="window.close()" class="btn btn-secondary">Close Tab</button>
     </div>
 
     <div id="capture" class="id-card">
@@ -161,12 +164,12 @@ endif; ?>
             <div class="info-row"><strong>Roll No</strong> <span><?php echo $student['roll_no'] ?: '-'; ?></span></div>
             <div class="info-row"><strong>Guardian</strong> <span><?php echo $student['parent_name'] ?: '-'; ?></span></div>
             <div class="info-row"><strong>Phone</strong> <span><?php echo $student['phone'] ?: '-'; ?></span></div>
-            <div class="info-row"><strong>Validity</strong> <span>2025-2026</span></div>
+            <div class="info-row"><strong>Validity</strong> <span>2024-2025</span></div>
         </div>
 
         <div class="qr-section">
             <img src="<?php echo $qr_url; ?>" alt="QR Code">
-            <div style="font-size: 0.6rem; color: #94a3b8; margin-top: 4px; font-weight: 700;">SCAN TO VERIFY / PAY FEE</div>
+            <div style="font-size: 0.55rem; color: #94a3b8; margin-top: 4px; font-weight: 700; letter-spacing: 0.5px;">SCAN TO VERIFY / PAY FEE</div>
         </div>
 
         <div class="card-footer">

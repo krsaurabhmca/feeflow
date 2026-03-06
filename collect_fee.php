@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['collect_fee'])) {
             <div class="alert alert-success">
                 <?php echo $message; ?>
                 <div style="margin-top: 1rem; display: flex; gap: 10px;">
-                    <a href="receipt.php?id=<?php echo $receipt_id; ?>" class="btn btn-primary" style="background: var(--dark);"><i class="fas fa-print"></i> Print Receipt</a>
-                    <a href="receipt.php?id=<?php echo $receipt_id; ?>&layout=a4_half" class="btn btn-secondary" style="background: white; border: 1px solid #e2e8f0; color: var(--dark);"><i class="fas fa-file-pdf"></i> Export (2-in-A4)</a>
+                    <a href="receipt.php?id=<?php echo $receipt_id; ?>" target="_blank" class="btn btn-primary" style="background: var(--dark);"><i class="fas fa-print"></i> Print Receipt</a>
+                    <a href="receipt.php?id=<?php echo $receipt_id; ?>&layout=a4_half" target="_blank" class="btn btn-secondary" style="background: white; border: 1px solid #e2e8f0; color: var(--dark);"><i class="fas fa-file-pdf"></i> View & Export (2-in-A4)</a>
                 </div>
             </div>
         <?php

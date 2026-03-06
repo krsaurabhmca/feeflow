@@ -39,7 +39,7 @@ $total_paid = array_sum(array_column($fees, 'amount'));
 $ledger_token = $student['ledger_token'] ?? null;
 $public_link = $ledger_token ? BASE_URL . "student_ledger.php?token=" . $ledger_token : null;
 $qr_data = BASE_URL . "student_ledger.php?id=" . $student['id'];
-$qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($qr_data);
+$qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($qr_data);
 $theme_color = $student['receipt_color'] ?: '#dc2626';
 ?>
 <!DOCTYPE html>
@@ -106,7 +106,7 @@ endif; ?>
                 
                 <?php if ($student['inst_upi']):
     $upi_link = "upi://pay?pa=" . $student['inst_upi'] . "&pn=" . urlencode($student['inst_name']) . "&tn=" . urlencode("Fees for " . $student['name']);
-    $pay_qr = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($upi_link);
+    $pay_qr = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($upi_link);
 ?>
                 <div class="glass-card" style="display: flex; align-items: center; gap: 15px; padding: 15px; border: 2px dashed var(--primary); background: #fdfdfd;">
                     <img src="<?php echo $pay_qr; ?>" width="80" alt="Pay QR">
