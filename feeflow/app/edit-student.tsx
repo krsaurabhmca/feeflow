@@ -80,85 +80,88 @@ export default function EditStudentScreen() {
         <SafeAreaView style={styles.container} edges={['left', 'top', 'right']}   >
             <Stack.Screen options={{ title: 'Edit Student', headerShown: true }} />
 
-            <View style={styles.form}>
-                <Text style={styles.label}>Full Name *</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Student Name"
-                    value={name}
-                    onChangeText={setName}
-                />
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.form}>
+                    <Text style={styles.label}>Full Name *</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Student Name"
+                        value={name}
+                        onChangeText={setName}
+                    />
 
-                <Text style={styles.label}>Select Class/Course *</Text>
-                <View style={styles.classGrid}>
-                    {classes.map((c) => (
-                        <TouchableOpacity
-                            key={c.id}
-                            style={[styles.classItem, classId === c.id.toString() && styles.classSelected]}
-                            onPress={() => setClassId(c.id.toString())}
-                        >
-                            <Text style={[styles.classText, classId === c.id.toString() && styles.classTextSelected]}>
-                                {c.class_name}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-
-                <View style={styles.row}>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.label}>Roll No</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="001"
-                            value={rollNo}
-                            onChangeText={setRollNo}
-                        />
+                    <Text style={styles.label}>Select Class/Course *</Text>
+                    <View style={styles.classGrid}>
+                        {classes.map((c) => (
+                            <TouchableOpacity
+                                key={c.id}
+                                style={[styles.classItem, classId === c.id.toString() && styles.classSelected]}
+                                onPress={() => setClassId(c.id.toString())}
+                            >
+                                <Text style={[styles.classText, classId === c.id.toString() && styles.classTextSelected]}>
+                                    {c.class_name}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.label}>Session</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="2024-25"
-                            value={session}
-                            onChangeText={setSession}
-                        />
+
+                    <View style={styles.row}>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.label}>Roll No</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="001"
+                                value={rollNo}
+                                onChangeText={setRollNo}
+                            />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.label}>Session</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="2024-25"
+                                value={session}
+                                onChangeText={setSession}
+                            />
+                        </View>
                     </View>
+
+                    <Text style={styles.label}>Phone Number</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="9988776655"
+                        value={phone}
+                        onChangeText={setPhone}
+                        keyboardType="phone-pad"
+                    />
+
+                    <Text style={styles.label}>Parent/Guardian Name</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Father/Mother Name"
+                        value={parent}
+                        onChangeText={setParent}
+                    />
+
+                    <TouchableOpacity
+                        style={[styles.button, saving && { opacity: 0.7 }]}
+                        onPress={handleUpdate}
+                        disabled={saving}
+                    >
+                        {saving ? (
+                            <ActivityIndicator color="white" />
+                        ) : (
+                            <>
+                                <Ionicons name="save-outline" size={20} color="white" style={{ marginRight: 10 }} />
+                                <Text style={styles.buttonText}>Save Changes</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
                 </View>
-
-                <Text style={styles.label}>Phone Number</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="9988776655"
-                    value={phone}
-                    onChangeText={setPhone}
-                    keyboardType="phone-pad"
-                />
-
-                <Text style={styles.label}>Parent/Guardian Name</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Father/Mother Name"
-                    value={parent}
-                    onChangeText={setParent}
-                />
-
-                <TouchableOpacity
-                    style={[styles.button, saving && { opacity: 0.7 }]}
-                    onPress={handleUpdate}
-                    disabled={saving}
-                >
-                    {saving ? (
-                        <ActivityIndicator color="white" />
-                    ) : (
-                        <>
-                            <Ionicons name="save-outline" size={20} color="white" style={{ marginRight: 10 }} />
-                            <Text style={styles.buttonText}>Save Changes</Text>
-                        </>
-                    )}
-                </TouchableOpacity>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     );
+
 }
 
 const styles = StyleSheet.create({
