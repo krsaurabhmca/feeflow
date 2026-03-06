@@ -4,8 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { getStudents, getClasses, collectFee, getCategories } from '../../lib/api';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { useLocalSearchParams } from 'expo-router';
 
 export default function CollectFeeScreen() {
+    const params = useLocalSearchParams();
     const [students, setStudents] = useState<any[]>([]);
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [amount, setAmount] = useState('');
@@ -22,7 +24,13 @@ export default function CollectFeeScreen() {
         getCategories().then(res => {
             if (res.status) setCategories(res.data);
         });
-    }, []);
+
+        if (params.student_id) {
+            setSelectedStudent({ id: params.student_id, name: params.name });
+            setSearch(params.name as string);
+        }
+    }, [params]);
+
 
     const searchStudents = async (query: string) => {
         setSearch(query);
@@ -72,22 +80,74 @@ export default function CollectFeeScreen() {
     const shareReceipt = async (receiptData: any) => {
         const html = `
       <html>
-        <body style="font-family: sans-serif; padding: 40px; text-align: center;">
-          <h1 style="color: #dc2626;">Fee Receipt</h1>
-          <hr>
-          <div style="text-align: left;">
-            <p><strong>Receipt No:</strong> ${receiptData.receipt_no}</p>
-            <p><strong>Student:</strong> ${selectedStudent.name}</p>
-            <p><strong>Fee:</strong> ${customFeeName || 'General Fee'}</p>
-            <p><strong>Amount:</strong> ₹${amount}</p>
-            <p><strong>Date:</strong> ${paymentDate}</p>
-            <p><strong>Method:</strong> ${paymentMethod}</p>
+        <head>
+          <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 20px; background-color: #f1f5f9; }
+            .receipt { background-color: #fff; padding: 40px; border-radius: 20px; max-width: 500px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+            .header { text-align: center; margin-bottom: 30px; }
+            .header h1 { color: #dc2626; margin: 0; font-size: 28px; }
+            .header p { color: #64748b; margin: 5px 0; }
+            .divider { border-top: 2px dashed #e2e8f0; margin: 25px 0; }
+            .item { display: flex; justify-content: space-between; margin-bottom: 12px; }
+            .label { color: #64748b; font-weight: 500; }
+            .value { color: #1e293b; font-weight: 700; text-align: right; }
+            .total-box { background-color: #dc2626; color: #fff; padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
+            .total-label { font-size: 14px; opacity: 0.9; }
+            .total-value { font-size: 32px; font-weight: 800; margin-top: 5px; }
+            .footer { text-align: center; margin-top: 30px; color: #94a3b8; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="receipt">
+            <div class="header">
+              <h1>FeeFlow Receipt</h1>
+              <p>Professional Fee Management</p>
+            </div>
+            
+            <div class="item">
+              <span class="label">Receipt No</span>
+              <span class="value">${receiptData.receipt_no}</span>
+            </div>
+            <div class="item">
+              <span class="label">Date</span>
+              <span class="value">${paymentDate}</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="item">
+              <span class="label">Student Name</span>
+              <span class="value">${selectedStudent.name}</span>
+            </div>
+            <div class="item">
+              <span class="label">Class/Roll</span>
+              <span class="value">${selectedStudent.class_name} / ${selectedStudent.roll_no}</span>
+            </div>
+            <div class="item">
+              <span class="label">Fee Category</span>
+              <span class="value">${customFeeName || 'General Fee'}</span>
+            </div>
+             <div class="item">
+              <span class="label">Payment Mode</span>
+              <span class="value">${paymentMethod}</span>
+            </div>
+
+            <div class="total-box">
+              <div class="total-label">Amount Paid</div>
+              <div class="total-value">₹${amount}</div>
+            </div>
+
+            <div class="divider"></div>
+            
+            <div class="footer">
+              <p>This is a computer-generated receipt.</p>
+              <p>Thank you for your payment!</p>
+            </div>
           </div>
-          <hr>
-          <p>Thank you for your payment!</p>
         </body>
       </html>
     `;
+
 
         try {
             const { uri } = await Print.printToFileAsync({ html });

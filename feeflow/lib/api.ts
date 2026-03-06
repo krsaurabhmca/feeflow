@@ -82,4 +82,10 @@ export const addStudent = async (data: any) => {
     return response.data;
 };
 
+export const updateStudent = async (id: any, data: any) => {
+    const response = await api.post(`students.php?action=update&id=${id}`, data);
+    return response.data;
+};
+
+
 

@@ -26,25 +26,55 @@ if ($method === 'GET') {
 
 if ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"));
+    if (!$data)
+        $data = (object)$_POST;
 
-    if (!isset($data->name) || !isset($data->class_id)) {
-        sendResponse(false, "Name and Class ID are required", null, 400);
-    }
+    $action = $_GET['action'] ?? '';
+    $id = $_GET['id'] ?? null;
 
-    $stmt = $pdo->prepare("INSERT INTO students (institute_id, class_id, name, roll_no, phone, parent_name, session) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    if ($stmt->execute([
-    $institute_id,
-    $data->class_id,
-    $data->name,
-    $data->roll_no ?? null,
-    $data->phone ?? null,
-    $data->parent_name ?? null,
-    $data->session ?? null
-    ])) {
-        sendResponse(true, "Student registered successfully", ["id" => $pdo->lastInsertId()]);
+    if ($action === 'update' && $id) {
+        if (!isset($data->name) || !isset($data->class_id)) {
+            sendResponse(false, "Name and Class ID are required", null, 400);
+        }
+
+        $stmt = $pdo->prepare("UPDATE students SET class_id = ?, name = ?, roll_no = ?, phone = ?, parent_name = ?, session = ? WHERE id = ? AND institute_id = ?");
+        if ($stmt->execute([
+        $data->class_id,
+        $data->name,
+        $data->roll_no ?? null,
+        $data->phone ?? null,
+        $data->parent_name ?? null,
+        $data->session ?? null,
+        $id,
+        $institute_id
+        ])) {
+            sendResponse(true, "Student updated successfully");
+        }
+        else {
+            sendResponse(false, "Failed to update student");
+        }
     }
     else {
-        sendResponse(false, "Failed to register student");
+        if (!isset($data->name) || !isset($data->class_id)) {
+            sendResponse(false, "Name and Class ID are required", null, 400);
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO students (institute_id, class_id, name, roll_no, phone, parent_name, session) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt->execute([
+        $institute_id,
+        $data->class_id,
+        $data->name,
+        $data->roll_no ?? null,
+        $data->phone ?? null,
+        $data->parent_name ?? null,
+        $data->session ?? null
+        ])) {
+            sendResponse(true, "Student registered successfully", ["id" => $pdo->lastInsertId()]);
+        }
+        else {
+            sendResponse(false, "Failed to register student");
+        }
     }
 }
 ?>
+
