@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 // Replace with your actual development machine IP for local testing
-const BASE_URL = 'http://192.168.1.5/feeflow/api/v1/';
+const BASE_URL = 'http://192.168.1.4/feeflow/api/v1/';
 
 const api = axios.create({
     baseURL: BASE_URL,
@@ -21,7 +21,7 @@ api.interceptors.request.use(async (config) => {
 
 export default api;
 
-export const login = async (email, password) => {
+export const login = async (email: any, password: any) => {
     const response = await api.post('login.php', { email, password });
     return response.data;
 };
@@ -31,7 +31,7 @@ export const getDashboard = async () => {
     return response.data;
 };
 
-export const getStudents = async (search = '') => {
+export const getStudents = async (search: string = '') => {
     const response = await api.get(`students.php?search=${search}`);
     return response.data;
 };
@@ -41,7 +41,7 @@ export const getClasses = async () => {
     return response.data;
 };
 
-export const collectFee = async (data) => {
+export const collectFee = async (data: any) => {
     const response = await api.post('fees.php', data);
     return response.data;
 };
