@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 // Replace with your actual development machine IP for local testing
-const BASE_URL = 'http://192.168.1.4/feeflow/api/v1/';
+const BASE_URL = 'https://feeflow.offerplant.com/api/v1/';
 
 const api = axios.create({
     baseURL: BASE_URL,

@@ -3,6 +3,11 @@ require_once 'api_helper.php';
 
 $data = json_decode(file_get_contents("php://input"));
 
+// Safety fallback for some hosting environments
+if (!$data) {
+    $data = (object)$_POST;
+}
+
 if (!isset($data->email) || !isset($data->password)) {
     sendResponse(false, "Email and password are required", null, 400);
 }
