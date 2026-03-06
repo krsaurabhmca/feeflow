@@ -20,9 +20,22 @@ $stmt = $pdo->prepare("SELECT f.*, s.name as student_name FROM fees f JOIN stude
 $stmt->execute([$institute_id]);
 $recent_transactions = $stmt->fetchAll();
 
+// Total Collection (Overall)
+$stmt = $pdo->prepare("SELECT SUM(amount) FROM fees WHERE institute_id = ?");
+$stmt->execute([$institute_id]);
+$total_collection = $stmt->fetchColumn() ?: 0;
+
+// Total Classes
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM classes WHERE institute_id = ?");
+$stmt->execute([$institute_id]);
+$total_classes = $stmt->fetchColumn() ?: 0;
+
 sendResponse(true, "Dashboard stats", [
     "total_students" => $total_students,
     "monthly_collection" => $monthly_collection,
+    "total_collection" => $total_collection,
+    "total_classes" => $total_classes,
     "recent_transactions" => $recent_transactions
 ]);
+
 ?>

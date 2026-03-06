@@ -3,11 +3,13 @@ import { StyleSheet, View, Text, ScrollView, RefreshControl, TouchableOpacity } 
 import { Ionicons } from '@expo/vector-icons';
 import { getDashboard } from '../../lib/api';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
 
 export default function DashboardScreen() {
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const router = useRouter();
 
     const loadData = async () => {
         try {
@@ -56,8 +58,27 @@ export default function DashboardScreen() {
                 </View>
             </View>
 
+            <View style={[styles.statsGrid, { marginTop: -15 }]}>
+                <View style={[styles.statCard, { backgroundColor: '#fff7ed' }]}>
+                    <Ionicons name="wallet" size={24} color="#f97316" />
+                    <Text style={styles.statLabel}>Total Collection</Text>
+                    <Text style={styles.statValue}>₹{stats?.total_collection || 0}</Text>
+                </View>
+                <View style={[styles.statCard, { backgroundColor: '#f5f3ff' }]}>
+                    <Ionicons name="business" size={24} color="#8b5cf6" />
+                    <Text style={styles.statLabel}>Total Classes</Text>
+                    <Text style={styles.statValue}>{stats?.total_classes || 0}</Text>
+                </View>
+            </View>
+
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Recent Transactions</Text>
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Recent Transactions</Text>
+                    <TouchableOpacity onPress={() => router.push('/receipts')}>
+                        <Text style={styles.viewAll}>View All</Text>
+                    </TouchableOpacity>
+                </View>
+
                 {stats?.recent_transactions.map((item: any, idx: number) => (
                     <View key={idx} style={styles.transactionItem}>
                         <View style={styles.transactionIcon}>
@@ -127,7 +148,16 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '700',
         color: '#1e293b',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 15,
+    },
+    viewAll: {
+        color: '#dc2626',
+        fontWeight: '700',
     },
     transactionItem: {
         flexDirection: 'row',

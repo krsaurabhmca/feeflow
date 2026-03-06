@@ -45,3 +45,25 @@ export const collectFee = async (data: any) => {
     const response = await api.post('fees.php', data);
     return response.data;
 };
+
+export const getStats = async () => {
+    const response = await api.get('dashboard.php');
+    return response.data;
+};
+
+export const getFees = async (student_id: any = null) => {
+    const url = student_id ? `fees.php?student_id=${student_id}` : 'fees.php';
+    const response = await api.get(url);
+    return response.data;
+};
+
+export const getCategories = async () => {
+    const response = await api.get('categories.php');
+    return response.data;
+};
+
+export const addCategory = async (data: any) => {
+    const response = await api.post('categories.php', data);
+    return response.data;
+};
+

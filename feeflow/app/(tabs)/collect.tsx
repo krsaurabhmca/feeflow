@@ -10,6 +10,9 @@ export default function CollectFeeScreen() {
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [amount, setAmount] = useState('');
     const [remarks, setRemarks] = useState('');
+    const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
+    const [paymentMethod, setPaymentMethod] = useState('Cash');
+    const [customFeeName, setCustomFeeName] = useState('');
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
 
@@ -35,7 +38,9 @@ export default function CollectFeeScreen() {
                 student_id: selectedStudent.id,
                 amount: parseFloat(amount),
                 remarks: remarks,
-                payment_method: 'App Payment'
+                payment_date: paymentDate,
+                payment_method: paymentMethod,
+                custom_fee_name: customFeeName
             });
 
             if (response.status) {
@@ -64,8 +69,10 @@ export default function CollectFeeScreen() {
           <div style="text-align: left;">
             <p><strong>Receipt No:</strong> ${receiptData.receipt_no}</p>
             <p><strong>Student:</strong> ${selectedStudent.name}</p>
+            <p><strong>Fee:</strong> ${customFeeName || 'General Fee'}</p>
             <p><strong>Amount:</strong> ₹${amount}</p>
-            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Date:</strong> ${paymentDate}</p>
+            <p><strong>Method:</strong> ${paymentMethod}</p>
           </div>
           <hr>
           <p>Thank you for your payment!</p>
@@ -92,6 +99,9 @@ export default function CollectFeeScreen() {
         setAmount('');
         setRemarks('');
         setSearch('');
+        setPaymentDate(new Date().toISOString().split('T')[0]);
+        setPaymentMethod('Cash');
+        setCustomFeeName('');
         setStudents([]);
     };
 
@@ -141,9 +151,38 @@ export default function CollectFeeScreen() {
                     keyboardType="numeric"
                 />
 
+                <Text style={styles.label}>Fee Name / Type</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="e.g. Admission Fee, Monthly Fee"
+                    value={customFeeName}
+                    onChangeText={setCustomFeeName}
+                />
+
+                <View style={styles.row}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.label}>Date</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="YYYY-MM-DD"
+                            value={paymentDate}
+                            onChangeText={setPaymentDate}
+                        />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.label}>Payment Mode</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Cash, Online, etc."
+                            value={paymentMethod}
+                            onChangeText={setPaymentMethod}
+                        />
+                    </View>
+                </View>
+
                 <Text style={styles.label}>Remarks</Text>
                 <TextInput
-                    style={[styles.input, { height: 100 }]}
+                    style={[styles.input, { height: 80 }]}
                     placeholder="Optional notes..."
                     value={remarks}
                     onChangeText={setRemarks}
@@ -176,7 +215,11 @@ const styles = StyleSheet.create({
     },
     form: {
         padding: 20,
-        gap: 15,
+        gap: 12,
+    },
+    row: {
+        flexDirection: 'row',
+        gap: 10,
     },
     label: {
         fontWeight: '700',

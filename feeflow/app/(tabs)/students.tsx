@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getStudents } from '../../lib/api';
+import { useRouter } from 'expo-router';
 
 export default function StudentsScreen() {
     const [students, setStudents] = useState<any[]>([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     const loadStudents = async (query = '') => {
         try {
@@ -31,7 +33,10 @@ export default function StudentsScreen() {
     };
 
     const renderItem = ({ item }: { item: any }) => (
-        <View style={styles.card}>
+        <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push({ pathname: '/student-details', params: { id: item.id } })}
+        >
             <View style={styles.avatar}>
                 <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
             </View>
@@ -39,10 +44,10 @@ export default function StudentsScreen() {
                 <Text style={styles.name}>{item.name}</Text>
                 <Text style={styles.meta}>Class: {item.class_name} • Roll: {item.roll_no}</Text>
             </View>
-            <TouchableOpacity style={styles.actionBtn}>
+            <View style={styles.goBtn}>
                 <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
-            </TouchableOpacity>
-        </View>
+            </View>
+        </TouchableOpacity>
     );
 
     return (
@@ -134,7 +139,7 @@ const styles = StyleSheet.create({
         color: '#64748b',
         marginTop: 2,
     },
-    actionBtn: {
+    goBtn: {
         padding: 5,
     },
     emptyText: {

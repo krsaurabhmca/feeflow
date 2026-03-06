@@ -1,16 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useRouter } from 'expo-router';
+import { getCategories, addCategory } from '../../lib/api';
 
 export default function SettingsScreen() {
     const [instName, setInstName] = useState('');
+    const [categories, setCategories] = useState<any[]>([]);
+    const [newCat, setNewCat] = useState('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         SecureStore.getItemAsync('institute_name').then(name => setInstName(name || 'Institute'));
+        loadCategories();
     }, []);
+
+    const loadCategories = async () => {
+        const resp = await getCategories();
+        if (resp.status) setCategories(resp.data);
+    };
+
+    const handleAddCategory = async () => {
+        if (!newCat) return;
+        setLoading(true);
+        const resp = await addCategory({ category_name: newCat });
+        setLoading(true);
+        if (resp.status) {
+            setNewCat('');
+            loadCategories();
+            Alert.alert('Success', 'Category added');
+        }
+        setLoading(false);
+    };
 
     const handleLogout = async () => {
         Alert.alert('Logout', 'Are you sure you want to sign out?', [
@@ -38,19 +61,29 @@ export default function SettingsScreen() {
             </View>
 
             <View style={styles.menu}>
-                <TouchableOpacity style={styles.menuItem}>
-                    <Ionicons name="document-text" size={24} color="#64748b" />
-                    <Text style={styles.menuText}>Institute Profile</Text>
-                    <Ionicons name="chevron-forward" size={20} color="#cbd5e1" />
-                </TouchableOpacity>
+                <Text style={styles.sectionLabel}>Fee Categories</Text>
+                <View style={styles.addBox}>
+                    <TextInput
+                        style={styles.smallInput}
+                        placeholder="Add new category..."
+                        value={newCat}
+                        onChangeText={setNewCat}
+                    />
+                    <TouchableOpacity style={styles.addBtn} onPress={handleAddCategory} disabled={loading}>
+                        <Ionicons name="add" size={24} color="white" />
+                    </TouchableOpacity>
+                </View>
+                {categories.map((c, i) => (
+                    <View key={i} style={styles.menuItem}>
+                        <Ionicons name="list" size={20} color="#64748b" />
+                        <Text style={styles.menuText}>{c.category_name}</Text>
+                    </View>
+                ))}
+            </View>
 
-                <TouchableOpacity style={styles.menuItem}>
-                    <Ionicons name="lock-closed" size={24} color="#64748b" />
-                    <Text style={styles.menuText}>Security Settings</Text>
-                    <Ionicons name="chevron-forward" size={20} color="#cbd5e1" />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={handleLogout}>
+            <View style={[styles.menu, { marginTop: 20 }]}>
+                <Text style={styles.sectionLabel}>Account</Text>
+                <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                     <Ionicons name="log-out" size={24} color="#dc2626" />
                     <Text style={[styles.menuText, { color: '#dc2626' }]}>Sign Out</Text>
                 </TouchableOpacity>
@@ -105,6 +138,35 @@ const styles = StyleSheet.create({
         padding: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
+    },
+    sectionLabel: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#94a3b8',
+        textTransform: 'uppercase',
+        paddingHorizontal: 15,
+        paddingTop: 15,
+        paddingBottom: 5,
+    },
+    addBox: {
+        flexDirection: 'row',
+        padding: 15,
+        gap: 10,
+    },
+    smallInput: {
+        flex: 1,
+        backgroundColor: '#f1f5f9',
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        height: 44,
+    },
+    addBtn: {
+        backgroundColor: '#dc2626',
+        width: 44,
+        height: 44,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     menuText: {
         flex: 1,
