@@ -45,10 +45,14 @@ export default function StudentDetailsScreen() {
                 headerShown: true,
                 headerStyle: { backgroundColor: '#fff' },
                 headerRight: () => (
-                    <TouchableOpacity onPress={() => router.push({ pathname: '/edit-student', params: { id } })}>
+                    <TouchableOpacity
+                        onPress={() => router.push({ pathname: '/edit-student', params: { id } })}
+                        style={{ marginRight: 15 }}
+                    >
                         <Ionicons name="create-outline" size={24} color="#dc2626" />
                     </TouchableOpacity>
                 )
+
             }} />
 
             <ScrollView showsVerticalScrollIndicator={false}>

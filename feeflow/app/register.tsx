@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import { register } from '../lib/api';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
     const [name, setName] = useState('');
@@ -86,7 +86,7 @@ export default function RegisterScreen() {
                                 secureTextEntry={!showPassword}
                             />
                             <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPassword(!showPassword)}>
-                                <Ionicons name={showPassword ? "eye-off" : "eye"} size={20} color="#64748b" />
+                                <MaterialIcons name={showPassword ? "visibility-off" : "visibility"} size={22} color="#64748b" />
                             </TouchableOpacity>
                         </View>
 

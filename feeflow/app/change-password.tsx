@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { changePassword } from '../lib/api';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 export default function ChangePasswordScreen() {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -65,7 +65,7 @@ export default function ChangePasswordScreen() {
                         secureTextEntry={!showCurrent}
                     />
                     <TouchableOpacity onPress={() => setShowCurrent(!showCurrent)} style={styles.eyeBtn}>
-                        <Ionicons name={showCurrent ? "eye-off" : "eye"} size={20} color="#64748b" />
+                        <MaterialIcons name={showCurrent ? "visibility-off" : "visibility"} size={22} color="#64748b" />
                     </TouchableOpacity>
                 </View>
 
@@ -79,7 +79,7 @@ export default function ChangePasswordScreen() {
                         secureTextEntry={!showNew}
                     />
                     <TouchableOpacity onPress={() => setShowNew(!showNew)} style={styles.eyeBtn}>
-                        <Ionicons name={showNew ? "eye-off" : "eye"} size={20} color="#64748b" />
+                        <MaterialIcons name={showNew ? "visibility-off" : "visibility"} size={22} color="#64748b" />
                     </TouchableOpacity>
                 </View>
 

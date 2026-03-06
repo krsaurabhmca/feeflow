@@ -72,9 +72,12 @@ export default function CollectFeeScreen() {
                         { text: 'Done', onPress: resetForm }
                     ]
                 );
+            } else {
+                Alert.alert('Error', response.message || 'Failed to collect fee');
             }
-        } catch (e) {
-            Alert.alert('Error', 'Failed to collect fee');
+        } catch (e: any) {
+            const msg = e.response?.data?.message || 'Failed to collect fee';
+            Alert.alert('Error', msg);
         } finally {
             setLoading(false);
         }
@@ -158,7 +161,7 @@ export default function CollectFeeScreen() {
 
             // Direct WhatsApp link if phone is available
             if (selectedStudent.phone) {
-                const message = `High, your payment of ₹${amount} for ${selectedStudent.name} has been received. Receipt No: ${receiptData.receipt_no}`;
+                const message = `Hi, your payment of ₹${amount} for ${selectedStudent.name} has been received. Receipt No: ${receiptData.receipt_no}`;
                 Linking.openURL(`whatsapp://send?phone=91${selectedStudent.phone}&text=${encodeURIComponent(message)}`);
             }
         } catch (e) {
