@@ -67,7 +67,7 @@ $theme_color = $stmt->fetchColumn() ?: '#dc2626';
                     </a>
                 </div>
                 <div style="padding-top: 1rem; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05);">
-                    <a href="logout.php" class="nav-link" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 0.75rem; margin-top: 0.5rem;">
+                    <a href="logout.php" class="nav-link" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 0.75rem; margin-top: 0.5rem;" data-confirm="Are you sure you want to sign out of your account?" data-title="Sign Out?">
                         <i class="fas fa-power-off"></i> <strong>Sign Out</strong>
                     </a>
                 </div>
@@ -106,7 +106,7 @@ $theme_color = $stmt->fetchColumn() ?: '#dc2626';
                         <i class="fas fa-university" style="color: var(--primary);"></i>
                         <strong><?php echo $_SESSION['institute_name']; ?></strong>
                     </div>
-                    <a href="logout.php" class="btn btn-secondary" style="padding: 0.5rem 0.75rem; color: #ef4444;" title="Sign Out">
+                    <a href="logout.php" class="btn btn-secondary" style="padding: 0.5rem 0.75rem; color: #ef4444;" title="Sign Out" data-confirm="Are you sure you want to sign out?" data-title="Sign Out?">
                         <i class="fas fa-power-off"></i>
                     </a>
                 </div>

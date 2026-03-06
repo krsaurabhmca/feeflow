@@ -114,7 +114,7 @@ endforeach; ?>
                     <td class="no-print" style="text-align: center;">
                         <div style="display: flex; gap: 5px; justify-content: center;">
                             <a href="receipt.php?id=<?php echo $fee['id']; ?>" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.75rem; border-radius: 8px;" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="delete_fee.php?id=<?php echo $fee['id']; ?>" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; color: var(--danger);" title="Cancel" onclick="return confirm('Cancel this receipt?')"><i class="fas fa-trash-can"></i></a>
+                            <a href="delete_fee.php?id=<?php echo $fee['id']; ?>" class="btn btn-secondary" style="padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; color: var(--danger);" title="Cancel" data-confirm="Are you sure you want to cancel this receipt? This action will reverse the payment entry." data-title="Cancel Receipt?"><i class="fas fa-trash-can"></i></a>
                         </div>
                     </td>
                 </tr>

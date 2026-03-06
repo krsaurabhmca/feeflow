@@ -69,9 +69,9 @@ endif; ?>
                                     <a href="edit_category.php?id=<?php echo $cat['id']; ?>" class="btn-secondary" style="padding: 5px 10px; border-radius: 6px; color: var(--primary); text-decoration: none;">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="delete_category.php?id=<?php echo $cat['id']; ?>" class="btn-secondary" style="padding: 5px 10px; border-radius: 6px; color: var(--danger); text-decoration: none;" onclick="return confirm('Delete this category?')">
-                                        <i class="fas fa-trash-can"></i>
-                                    </a>
+                                    <a href="delete_category.php?id=<?php echo $cat['id']; ?>" class="btn-secondary" style="padding: 5px 10px; border-radius: 6px; color: var(--danger); text-decoration: none;" data-confirm="Are you sure you want to delete this category? Students with this category will be unassigned." data-title="Delete Category?">
+                                         <i class="fas fa-trash-can"></i>
+                                     </a>
                                 </div>
                             </td>
                         </tr>

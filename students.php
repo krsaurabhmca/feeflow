@@ -78,7 +78,7 @@ endif; ?>
                             <a href="edit_student.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" title="Edit"><i class="fas fa-edit"></i></a>
                             <a href="student_ledger.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" title="Ledger"><i class="fas fa-file-lines"></i></a>
                             <a href="id_card.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" title="ID Card"><i class="fas fa-id-badge"></i></a>
-                            <a href="delete_student.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem; color: var(--danger);" title="Delete" onclick="return confirm('Delete this student?')"><i class="fas fa-trash-can"></i></a>
+                            <a href="delete_student.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem; color: var(--danger);" title="Delete" data-confirm="Are you sure you want to delete this student and all their fee records?" data-title="Delete Student?"><i class="fas fa-trash-can"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -115,6 +115,7 @@ endif; ?>
             <div class="actions">
                 <a href="student_ledger.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.75rem;"><i class="fas fa-file-invoice"></i> Ledger</a>
                 <a href="id_card.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 0.75rem;"><i class="fas fa-id-card"></i> ID Card</a>
+                <a href="delete_student.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary btn-sm" style="flex: 0.2; font-size: 0.75rem; color: var(--danger);" data-confirm="Delete this student?" data-title="Delete Student?"><i class="fas fa-trash-can"></i></a>
             </div>
         </div>
     <?php

@@ -60,7 +60,7 @@ endif; ?>
                             <td><?php echo date('d M, Y', strtotime($class['created_at'])); ?></td>
                             <td>
                                 <a href="edit_class.php?id=<?php echo $class['id']; ?>" style="color: var(--primary); margin-right: 10px;">Edit</a>
-                                <a href="delete_class.php?id=<?php echo $class['id']; ?>" style="color: var(--danger);" onclick="return confirm('Are you sure?')">Delete</a>
+                                <a href="delete_class.php?id=<?php echo $class['id']; ?>" style="color: var(--danger);" data-confirm="Are you sure you want to delete this class? All associated students may be affected." data-title="Delete Class?">Delete</a>
                             </td>
                         </tr>
                     <?php
