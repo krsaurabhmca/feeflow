@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/config.php';
 if (!is_logged_in())
-    redirect('index.php');
+    redirect('login.php');
 
 $fee_id = $_GET['id'] ?? null;
 $layout = $_GET['layout'] ?? 'a4_full'; // a4_full or a4_half
@@ -9,8 +9,9 @@ $layout = $_GET['layout'] ?? 'a4_full'; // a4_full or a4_half
 if (!$fee_id)
     die("Invalid Request");
 
-$stmt = $pdo->prepare("SELECT f.*, s.name as student_name, s.roll_no, c.class_name, 
+$stmt = $pdo->prepare("SELECT f.*, s.name as student_name, s.roll_no, s.parent_name, s.session, c.class_name, 
                       i.name as inst_name, i.address as inst_address, i.phone as inst_phone, i.logo as inst_logo,
+                      i.recognition_text, i.affiliation_text,
                       i.receipt_color, i.tnc, i.signature_data, fc.category_name, i.qr_payment_link as inst_upi 
                       FROM fees f 
                       JOIN students s ON f.student_id = s.id 
@@ -24,223 +25,280 @@ $fee = $stmt->fetch();
 if (!$fee)
     die("Receipt not found");
 
-$primary_color = $fee['receipt_color'] ?: '#6366f1';
+$primary_color = $fee['receipt_color'] ?: '#003366'; // Defaulting to a deep academic blue if not set
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Receipt #<?php echo $fee['receipt_no']; ?></title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --p: <?php echo $primary_color; ?>; }
-        body { font-family: 'Inter', sans-serif; padding: 20px; color: #1e293b; background: #f1f5f9; margin: 0; }
+        :root { --primary: <?php echo $primary_color; ?>; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; }
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background: #f0f2f5; color: #333; }
+        
         .no-print { 
-            max-width: 210mm; 
-            margin: 0 auto 20px auto; 
+            max-width: 800px; 
+            margin: 20px auto; 
             background: white; 
             padding: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border-radius: 8px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .receipt-container { 
-            background: white; 
-            margin: auto; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 10mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
-            overflow: hidden;
         }
-        
-        /* Layouts */
-        .a4-full { width: 210mm; min-height: 297mm; padding: 60px; }
-        .a4-half { width: 210mm; height: 144mm; padding: 30px 40px; margin-bottom: 5mm; border-bottom: 1px dashed #ccc; }
-        
-        .a4-half .header { margin-bottom: 20px; padding-bottom: 15px; }
-        .a4-half .info-grid { margin-bottom: 20px; gap: 20px; }
-        .a4-half .table { margin-bottom: 20px; }
-        .a4-half .footer-grid { margin-top: 20px; gap: 30px; }
-        
-        .header { display: flex; justify-content: space-between; border-bottom: 3px solid var(--p); padding-bottom: 25px; margin-bottom: 30px; gap: 20px; }
-        .logo-box { flex: 1; max-width: 70%; } /* Added flex to handle long names */
-        .logo-box img { max-height: 80px; margin-bottom: 10px; }
-        .inst-name { font-size: 1.5rem; font-weight: 800; color: var(--p); margin: 0; line-height: 1.2; }
-        .receipt-title { font-size: 1.4rem; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 1px; color: #64748b; }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
-        .info-item { margin-bottom: 8px; font-size: 1rem; }
-        .info-item strong { color: #64748b; font-size: 0.85rem; text-transform: uppercase; display: block; }
-        
-        .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        .table th { background: var(--p); color: white; padding: 15px; text-align: left; }
-        .table td { padding: 15px; border-bottom: 1px solid #e2e8f0; }
-        .total-box { background: #f8fafc; padding: 20px; text-align: right; border-radius: 8px; border-left: 5px solid var(--p); }
-        .total-box h2 { margin: 0; color: var(--p); }
 
-        .footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 50px; margin-top: 50px; }
-        .tnc { font-size: 0.8rem; color: #64748b; }
-        .signature-box { text-align: center; }
-        .signature-img { max-width: 150px; border-bottom: 1px solid #333; margin-bottom: 5px; }
-        
+        .receipt-card {
+            border: 1px solid #eee;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-logo { width: 100px; height: 100px; object-fit: contain; }
+        .header-text { flex: 1; padding: 0 20px; }
+        .inst-name { color: var(--primary); font-size: 24px; font-weight: 900; margin: 0; text-transform: uppercase; }
+        .inst-details { font-size: 14px; margin: 5px 0; font-weight: 500; }
+        .inst-sub { font-size: 12px; color: #555; }
+
+        /* Receipt Bar */
+        .receipt-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        /* Info Grid */
+        .student-info {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+            border: 1.5px solid #e0e6ed;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .info-label { font-weight: 500; color: #444; }
+        .info-value { border-bottom: 1.5px dotted #ccc; font-weight: 700; color: #000; padding-left: 10px; }
+
+        /* Particulars Table */
+        .particulars-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .particulars-table th {
+            background: #f0f4f8;
+            color: var(--primary);
+            padding: 10px;
+            border: 1.5px solid #d1d9e6;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .particulars-table td {
+            padding: 12px 10px;
+            border: 1.5px solid #d1d9e6;
+            font-weight: 600;
+        }
+        .total-row td { background: #f8f9fa; font-weight: 800; }
+
+        /* Footer Info */
+        .footer-info {
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .footer-info .line { display: flex; gap: 10px; margin-bottom: 8px; }
+        .footer-info strong { min-width: 140px; }
+
+        .words-box {
+            border-top: 1.5px solid #eee;
+            border-bottom: 1.5px solid #eee;
+            padding: 10px 0;
+            margin: 15px 0;
+            font-weight: 700;
+        }
+
+        /* Final Footer */
+        .final-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 20px;
+        }
+        .qr-box { text-align: center; font-size: 10px; color: #666; }
+        .qr-box img { width: 90px; height: 90px; margin-bottom: 5px; border: 1px solid #eee; }
+        .signature-box { text-align: center; min-width: 180px; }
+        .sig-image { max-height: 50px; margin-bottom: 5px; }
+        .sig-line { border-top: 1.5px solid #333; padding-top: 5px; font-weight: 700; font-size: 13px; }
+
+        .generated-tag { text-align: center; font-size: 11px; color: #999; margin-top: 20px; border-bottom: 1.5px dashed #eee; padding-bottom: 5px; }
+
         @media print {
-            body { background: white; padding: 0; }
+            body { background: white; }
             .no-print { display: none; }
-            .receipt-container { box-shadow: none; }
-            .a4-full { padding: 20px; width: 210mm; } 
-            .a4-half { width: 210mm; height: 148.5mm; }
+            .page { margin: 0; box-shadow: none; width: 100%; height: 100%; }
         }
         
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .no-print { width: 100%; padding: 10px; gap: 10px; }
-            .receipt-container { width: 100% !important; height: auto !important; min-height: 0 !important; padding: 20px !important; }
-            .info-grid { grid-template-columns: 1fr; gap: 20px; }
-            .header { flex-direction: column; text-align: left; }
-            .header div:nth-child(2) { text-align: left !important; margin-top: 15px; }
-            .logo-box { max-width: 100%; }
-            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
-        }
+        .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; border: none; font-size: 13px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #e2e8f0; color: #475569; }
     </style>
 </head>
 <body>
+
     <div class="no-print">
         <div style="display: flex; gap: 10px; align-items: center;">
-            <span style="font-weight: 700; color: var(--secondary); font-size: 0.8rem; text-transform: uppercase;">Print Layout:</span>
-            <div style="background: #f1f5f9; padding: 4px; border-radius: 8px;">
-                <a href="receipt.php?id=<?php echo $fee_id; ?>&layout=a4_full" class="btn <?php echo $layout == 'a4_full' ? 'btn-primary' : ''; ?>" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;">Full A4</a>
-                <a href="receipt.php?id=<?php echo $fee_id; ?>&layout=a4_half" class="btn <?php echo $layout == 'a4_half' ? 'btn-primary' : ''; ?>" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 6px;">2-in-1 A4</a>
-            </div>
+            <button onclick="window.print()" class="btn btn-primary">Download / Print Receipt</button>
+            <a href="collect_fee.php" class="btn btn-secondary">New Collection</a>
+            <a href="reports.php" class="btn btn-secondary">All Receipts</a>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print"></i> Print Now</button>
-            <a href="reports.php" class="btn btn-secondary"><i class="fas fa-list-check"></i> All Receipts</a>
-            <a href="collect_fee.php" class="btn btn-secondary"><i class="fas fa-plus"></i> New Fee</a>
+        <div style="font-size: 12px; color: #666;">
+            <b>Tip:</b> Set layout to Portrait and remove headers/footers in print settings.
         </div>
     </div>
 
-    <?php
-// If half layout, we show it twice
-$iterations = ($layout == 'a4_half') ? 2 : 1;
-for ($i = 0; $i < $iterations; $i++):
-?>
-    <div class="receipt-container <?php echo($layout == 'a4_half') ? 'a4-half' : 'a4-full'; ?>">
-        <div class="header">
-            <div class="logo-box">
+    <div class="page">
+        <div class="receipt-card">
+            <!-- Header Section -->
+            <div class="header">
                 <?php if ($fee['inst_logo']): ?>
-                    <img src="assets/img/logos/<?php echo $fee['inst_logo']; ?>">
+                    <img src="assets/img/logos/<?php echo $fee['inst_logo']; ?>" class="header-logo">
                 <?php
-    endif; ?>
-                <h1 class="inst-name"><?php echo $fee['inst_name']; ?></h1>
-                <p style="margin: 5px 0; font-size: 0.85rem; color: #64748b;"><?php echo $fee['inst_address']; ?><br>Contact: <?php echo $fee['inst_phone']; ?></p>
-            </div>
-            <div style="text-align: right;">
-                <h2 class="receipt-title">Payment Receipt</h2>
-                <div style="margin-top: 15px; font-size: 0.9rem;">
-                    <strong>Receipt No:</strong> #<?php echo $fee['receipt_no']; ?><br>
-                    <strong>Date:</strong> <?php echo date('d M, Y', strtotime($fee['payment_date'])); ?>
-                </div>
-            </div>
-        </div>
-
-        <div class="info-grid">
-            <div class="glass-card" style="padding: 20px; background: #fbfbfb;">
-                <div class="info-item"><strong>Student Name</strong> <?php echo $fee['student_name']; ?></div>
-                <div class="info-item"><strong>Roll Number</strong> <?php echo $fee['roll_no']; ?></div>
-                <div class="info-item"><strong>Class/Course</strong> <?php echo $fee['class_name']; ?></div>
-            </div>
-            <div class="glass-card" style="padding: 20px; background: #fbfbfb;">
-                <div class="info-item"><strong>Payment Mode</strong> <?php echo $fee['payment_method']; ?></div>
-                <div class="info-item"><strong>Status</strong> <span style="color: #10b981; font-weight: 700;">● PAID</span></div>
-                <?php if ($fee['remarks']): ?>
-                    <div class="info-item"><strong>Remarks</strong> <?php echo $fee['remarks']; ?></div>
+else: ?>
+                    <div style="width: 100px; height: 100px; border: 1px solid #eee; display: grid; place-items: center; font-size: 10px;">LOGO</div>
                 <?php
-    endif; ?>
-            </div>
-        </div>
-
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Particulars / Fee Description</th>
-                    <th style="text-align: right; width: 150px;">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td style="font-weight: 600; font-size: 1.1rem;"><?php echo $fee['category_name'] ?: $fee['custom_fee_name']; ?></td>
-                    <td style="text-align: right; font-weight: 700; font-size: 1.1rem;">₹<?php echo number_format($fee['amount'], 2); ?></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="total-box">
-            <p style="margin-bottom: 5px; font-weight: 600; color: #64748b;">Total Amount Paid</p>
-            <h2>INR <?php echo number_format($fee['amount'], 2); ?></h2>
-        </div>
-        
-        <div style="margin-top: 10px; font-size: 0.85rem; color: #1e293b; border: 1px dashed #e2e8f0; padding: 10px; border-radius: 8px;">
-            <strong>Amount in Words:</strong> 
-            <span style="text-transform: capitalize;"><?php echo amount_in_words($fee['amount']); ?> only.</span>
-        </div>
-
-        <div class="footer-grid">
-            <div class="tnc">
-                <strong>Terms & Conditions:</strong><br>
-                <?php echo nl2br($fee['tnc'] ?: "1. This is a computer generated receipt.\n2. Fees once paid are non-refundable."); ?>
+endif; ?>
                 
-                <!-- Verification QR -->
-                <?php
-    $verify_data = BASE_URL . "student_ledger.php?id=" . $fee['student_id'];
-    $v_qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($verify_data);
+                <div class="header-text">
+                    <h1 class="inst-name"><?php echo $fee['inst_name']; ?></h1>
+                    <p class="inst-details"><?php echo $fee['inst_address']; ?></p>
+                    <p class="inst-sub">
+                        <?php if ($fee['recognition_text'])
+    echo $fee['recognition_text'] . "<br>"; ?>
+                        <?php if ($fee['affiliation_text'])
+    echo "<b>" . $fee['affiliation_text'] . "</b>"; ?>
+                    </p>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 2px solid var(--primary); margin: 0 0 15px 0;">
+
+            <!-- Receipt Metadata Bar -->
+            <div class="receipt-bar">
+                <span>Receipt No : <?php echo $fee['receipt_no']; ?></span>
+                <span style="text-align: right;">Date: <?php echo date('d-m-Y', strtotime($fee['payment_date'])); ?></span>
+            </div>
+
+            <!-- Student Detail Grid -->
+            <div class="student-info">
+                <span class="info-label">Student Name</span>
+                <span class="info-value">: <?php echo strtoupper($fee['student_name']); ?></span>
+                
+                <span class="info-label">Father's Name</span>
+                <span class="info-value">: <?php echo strtoupper($fee['parent_name']); ?></span>
+                
+                <span class="info-label">Course</span>
+                <span class="info-value">: <?php echo strtoupper($fee['class_name']); ?></span>
+                
+                <span class="info-label">Session</span>
+                <span class="info-value">: <?php echo strtoupper($fee['session'] ?: 'N/A'); ?></span>
+                
+                <span class="info-label">Admission No.</span>
+                <span class="info-value">: <?php echo strtoupper($fee['roll_no'] ?: 'N/A'); ?></span>
+            </div>
+
+            <!-- Particulars Table -->
+            <table class="particulars-table">
+                <thead>
+                    <tr>
+                        <th style="width: 10%; text-align: center;">S.No</th>
+                        <th style="text-align: left;">Particulars</th>
+                        <th style="width: 25%; text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: center;">1</td>
+                        <td><?php echo $fee['category_name'] ?: $fee['custom_fee_name']; ?></td>
+                        <td style="text-align: right;">₹<?php echo number_format($fee['amount'], 2); ?></td>
+                    </tr>
+                    <!-- Dynamic empty rows to fill space matching image feel -->
+                    <tr style="height: 40px;"><td></td><td></td><td></td></tr>
+                    <tr class="total-row">
+                        <td colspan="2" style="text-align: right; text-transform: uppercase;">Total</td>
+                        <td style="text-align: right;">₹<?php echo number_format($fee['amount'], 2); ?></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Payment Details Section -->
+            <div class="footer-info">
+                <div class="line">
+                    <strong>Payment Mode</strong> : <?php echo $fee['payment_method']; ?>
+                </div>
+                <div class="line">
+                    <strong>On Account Of</strong> : <?php echo $fee['category_name'] ?: $fee['custom_fee_name']; ?>
+                </div>
+                <div class="words-box">
+                    Amount (in words) : <span style="text-transform: capitalize;"><?php echo amount_in_words($fee['amount']); ?> Only</span>
+                </div>
+            </div>
+
+            <!-- Final Footer Section -->
+            <div class="final-footer">
+                <div class="qr-box">
+                    <?php
+$verify_data = BASE_URL . "student_ledger.php?id=" . $fee['student_id'];
+$v_qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($verify_data);
 ?>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px; padding: 10px; background: #f8fafc; border-radius: 8px; width: fit-content;">
-                    <img src="<?php echo $v_qr_url; ?>" width="55" alt="Verify QR">
-                    <div>
-                        <strong style="font-size: 0.7rem; color: var(--dark);">VERIFY RECEIPT</strong><br>
-                        <small style="font-size: 0.6rem; color: var(--secondary);">Scan to view digital ledger</small>
-                    </div>
+                    <img src="<?php echo $v_qr_url; ?>" alt="Verify QR">
+                    <p>Scan to Verify Receipt</p>
                 </div>
 
-                <!-- Payment QR (Optional) -->
-                <?php if ($fee['inst_upi']):
-        $upi_id = trim($fee['inst_upi']);
-        $upi_link = "upi://pay?pa=" . $upi_id . "&pn=" . urlencode($fee['inst_name']) . "&tn=" . urlencode("Fees for " . $fee['student_name']);
-        $p_qr_url = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" . urlencode($upi_link);
-?>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px; border: 1px dashed var(--p); border-radius: 8px; width: fit-content;">
-                    <img src="<?php echo $p_qr_url; ?>" width="55" alt="Payment QR">
-                    <div>
-                        <strong style="font-size: 0.7rem; color: var(--p);">PAYMENT SCANNER</strong><br>
-                        <small style="font-size: 0.6rem; color: var(--secondary);"><?php echo $upi_id; ?></small>
-                    </div>
+                <div class="signature-box">
+                    <?php if ($fee['signature_data']): ?>
+                        <img src="<?php echo $fee['signature_data']; ?>" class="sig-image">
+                    <?php
+else: ?>
+                        <div style="height: 50px;"></div>
+                    <?php
+endif; ?>
+                    <div class="sig-line">Authorized Signature</div>
                 </div>
-                <?php
-    endif; ?>
             </div>
-            <div class="signature-box">
-                <?php if ($fee['signature_data']): ?>
-                    <img src="<?php echo $fee['signature_data']; ?>" class="signature-img">
-                <?php
-    else: ?>
-                    <div style="height: 60px;"></div>
-                <?php
-    endif; ?>
-                <div style="font-weight: 700; font-size: 0.9rem;">AUTHORIZED SIGNATORY</div>
-                <div style="font-size: 0.75rem; color: #64748b;">(Accountant/Cashier)</div>
+
+            <div class="generated-tag">
+                This is a Computer Generated Receipt
             </div>
         </div>
-
-        <?php if ($layout == 'a4_half' && $i == 0): ?>
-            <!-- Cut Line -->
-            <div style="position: absolute; bottom: -10px; left: 0; width: 100%; text-align: center; color: #ccc; font-size: 0.7rem;">✂ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ✂</div>
-        <?php
-    endif; ?>
     </div>
-    <?php
-endfor; ?>
+
 </body>
 </html>

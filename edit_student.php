@@ -13,9 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_student'])) {
     $class_id = $_POST['class_id'];
     $phone = $_POST['phone'];
     $parent_name = $_POST['parent_name'];
+    $session = $_POST['session'];
 
-    $stmt = $pdo->prepare("UPDATE students SET name = ?, roll_no = ?, class_id = ?, phone = ?, parent_name = ? WHERE id = ? AND institute_id = ?");
-    if ($stmt->execute([$name, $roll_no, $class_id, $phone, $parent_name, $id, $institute_id])) {
+    $stmt = $pdo->prepare("UPDATE students SET name = ?, roll_no = ?, class_id = ?, phone = ?, parent_name = ?, session = ? WHERE id = ? AND institute_id = ?");
+    if ($stmt->execute([$name, $roll_no, $class_id, $phone, $parent_name, $session, $id, $institute_id])) {
         $message = "Student record updated!";
     }
 }
@@ -72,6 +73,10 @@ endforeach; ?>
         <div class="form-group">
             <label>Parent/Guardian</label>
             <input type="text" name="parent_name" class="form-control" value="<?php echo htmlspecialchars($student['parent_name']); ?>">
+        </div>
+        <div class="form-group">
+            <label>Academic Session</label>
+            <input type="text" name="session" class="form-control" value="<?php echo htmlspecialchars($student['session']); ?>" placeholder="e.g. 2024-2026">
         </div>
         <button type="submit" name="update_student" class="btn btn-primary btn-block">Update Record</button>
     </form>

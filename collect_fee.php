@@ -29,13 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['collect_fee'])) {
     $method = $_POST['payment_method'];
     $remarks = $_POST['remarks'];
 
-    // Sequential Receipt No: [3-digit Inst ID]-[4-digit Serial]
-    $inst_prefix = str_pad($institute_id, 3, '0', STR_PAD_LEFT);
+    // Sequential Receipt No: [Prefix][4-digit Serial]
+    $inst_stmt = $pdo->prepare("SELECT receipt_prefix FROM institutes WHERE id = ?");
+    $inst_stmt->execute([$institute_id]);
+    $inst_data = $inst_stmt->fetch();
+    $prefix = $inst_data['receipt_prefix'] ?: str_pad($institute_id, 3, '0', STR_PAD_LEFT) . '-';
 
     $last_rec = $pdo->prepare("SELECT COUNT(*) FROM fees WHERE institute_id = ?");
     $last_rec->execute([$institute_id]);
     $next_serial = str_pad($last_rec->fetchColumn() + 1, 4, '0', STR_PAD_LEFT);
-    $receipt_no = $inst_prefix . '-' . $next_serial;
+    $receipt_no = $prefix . $next_serial;
 
     $stmt = $pdo->prepare("INSERT INTO fees (institute_id, student_id, fee_category_id, custom_fee_name, amount, payment_date, payment_method, receipt_no, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt->execute([$institute_id, $student_id, $fee_cat_id, $custom_fee_name, $amount, $payment_date, $method, $receipt_no, $remarks])) {

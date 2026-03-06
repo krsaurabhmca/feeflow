@@ -10,6 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
     $name = $_POST['name'];
     $phone = $_POST['phone'];
     $address = $_POST['address'];
+    $recognition = $_POST['recognition_text'];
+    $affiliation = $_POST['affiliation_text'];
+    $prefix = $_POST['receipt_prefix'];
     $qr_link = $_POST['qr_payment_link'];
     $tnc = $_POST['tnc'];
     $receipt_color = $_POST['receipt_color'];
@@ -26,8 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE institutes SET name = ?, phone = ?, address = ?, qr_payment_link = ?, logo = ?, tnc = ?, receipt_color = ?, signature_data = ? WHERE id = ?");
-    if ($stmt->execute([$name, $phone, $address, $qr_link, $logo_name, $tnc, $receipt_color, $signature_data, $institute_id])) {
+    $stmt = $pdo->prepare("UPDATE institutes SET name = ?, phone = ?, address = ?, recognition_text = ?, affiliation_text = ?, receipt_prefix = ?, qr_payment_link = ?, logo = ?, tnc = ?, receipt_color = ?, signature_data = ? WHERE id = ?");
+    if ($stmt->execute([$name, $phone, $address, $recognition, $affiliation, $prefix, $qr_link, $logo_name, $tnc, $receipt_color, $signature_data, $institute_id])) {
         $_SESSION['institute_name'] = $name;
         $message = "Settings updated successfully!";
     }
@@ -78,7 +81,15 @@ endif; ?>
                 </div>
                 <div class="form-group">
                     <label>Physical Address</label>
-                    <textarea name="address" class="form-control" rows="3"><?php echo $profile['address']; ?></textarea>
+                    <textarea name="address" class="form-control" rows="2"><?php echo $profile['address']; ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Recognition Text</label>
+                    <input type="text" name="recognition_text" class="form-control" value="<?php echo $profile['recognition_text']; ?>" placeholder="e.g. Recognized by Govt. of Bihar">
+                </div>
+                <div class="form-group">
+                    <label>Affiliation Text</label>
+                    <input type="text" name="affiliation_text" class="form-control" value="<?php echo $profile['affiliation_text']; ?>" placeholder="e.g. Affiliated to BUHS Patna">
                 </div>
             </div>
 
@@ -91,6 +102,10 @@ endif; ?>
                         <input type="color" name="receipt_color" class="form-control" style="width: 100px; height: 45px; padding: 2px;" value="<?php echo $profile['receipt_color'] ?: '#dc2626'; ?>">
                         <span style="font-size: 0.8rem; color: var(--secondary);">Applies to entire dashboard & receipts</span>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>Receipt No. Prefix</label>
+                    <input type="text" name="receipt_prefix" class="form-control" value="<?php echo $profile['receipt_prefix']; ?>" placeholder="e.g. KRNCH/2026/">
                 </div>
                 
                 <div class="form-group">

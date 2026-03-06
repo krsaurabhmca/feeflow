@@ -17,9 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_student'])) {
     $class_id = $_POST['class_id'];
     $phone = $_POST['phone'];
     $parent_name = $_POST['parent_name'];
+    $session = $_POST['session'];
 
-    $stmt = $pdo->prepare("INSERT INTO students (institute_id, class_id, name, roll_no, phone, parent_name) VALUES (?, ?, ?, ?, ?, ?)");
-    if ($stmt->execute([$institute_id, $class_id, $name, $roll_no, $phone, $parent_name])) {
+    $stmt = $pdo->prepare("INSERT INTO students (institute_id, class_id, name, roll_no, phone, parent_name, session) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    if ($stmt->execute([$institute_id, $class_id, $name, $roll_no, $phone, $parent_name, $session])) {
         $message = "Student registered successfully!";
     }
 }
@@ -158,6 +159,10 @@ endforeach; ?>
             <div class="form-group">
                 <label>Parent/Guardian</label>
                 <input type="text" name="parent_name" class="form-control" placeholder="Name of Father/Mother">
+            </div>
+            <div class="form-group">
+                <label>Academic Session</label>
+                <input type="text" name="session" class="form-control" placeholder="e.g. 2024-2026">
             </div>
             <button type="submit" name="add_student" class="btn btn-primary btn-block" style="margin-top: 1rem;"><i class="fas fa-save"></i> Register Student</button>
         </form>
