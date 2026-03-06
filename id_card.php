@@ -19,7 +19,7 @@ if (!$student)
     die("Student not found");
 
 $qr_data = BASE_URL . "student_ledger.php?id=" . $student['id'];
-$qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($qr_data);
+$qr_url = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" . urlencode($qr_data) . "&choe=UTF-8";
 $theme_color = $student['receipt_color'] ?: '#dc2626';
 ?>
 <!DOCTYPE html>

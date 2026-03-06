@@ -22,44 +22,37 @@ $total_classes->execute([$institute_id]);
 $total_classes = $total_classes->fetchColumn();
 ?>
 
-<div class="stats-grid fade-in">
-    <div class="glass-card stat-card">
+<div class="stats-grid fade-in" style="gap: 1rem; margin-bottom: 1rem;">
+    <div class="glass-card stat-card" style="padding: 1rem;">
         <div class="stat-label">Students</div>
         <div class="stat-value"><?php echo $total_students; ?></div>
-        <div style="color: var(--primary); font-size: 0.75rem;"><i class="fas fa-layer-group"></i> Active</div>
+        <div style="color: var(--primary); font-size: 0.7rem; font-weight: 600;"><i class="fas fa-user-check"></i> ACTIVE</div>
     </div>
-    <div class="glass-card stat-card">
-        <div class="stat-label">Total Collection</div>
+    <div class="glass-card stat-card" style="padding: 1rem;">
+        <div class="stat-label">Total Revenue</div>
         <div class="stat-value">₹<?php echo number_format($total_collection / 1000, 1); ?>k</div>
-        <div style="color: var(--success); font-size: 0.75rem;"><i class="fas fa-arrow-trend-up"></i> Growth</div>
+        <div style="color: var(--success); font-size: 0.7rem; font-weight: 600;"><i class="fas fa-chart-line"></i> +12% VS LAST MONTH</div>
     </div>
-    <div class="glass-card stat-card">
+    <div class="glass-card stat-card" style="padding: 1rem;">
         <div class="stat-label">Today</div>
         <div class="stat-value">₹<?php echo number_format($today_collection, 0); ?></div>
-        <div style="color: var(--warning); font-size: 0.75rem;"><i class="fas fa-calendar-check"></i> Collected</div>
+        <div style="color: var(--warning); font-size: 0.7rem; font-weight: 600;"><i class="fas fa-clock"></i> ON TRACK</div>
     </div>
-    <div class="glass-card stat-card">
+    <div class="glass-card stat-card" style="padding: 1rem;">
         <div class="stat-label">Classes</div>
         <div class="stat-value"><?php echo $total_classes; ?></div>
-        <div style="color: var(--secondary); font-size: 0.75rem;"><i class="fas fa-school"></i> Courses</div>
+        <div style="color: var(--secondary); font-size: 0.7rem; font-weight: 600;"><i class="fas fa-building"></i> VARIOUS COURSES</div>
     </div>
 </div>
 
-<div class="grid-2">
-    <div class="glass-card" style="padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3><i class="fas fa-history" style="opacity: 0.5;"></i> Recent Fees</h3>
-            <a href="reports.php" style="color: var(--primary); font-size: 0.8rem; font-weight: 700; text-decoration: none;">VIEW ALL</a>
+<div class="grid-2" style="gap: 1rem;">
+    <div class="glass-card" style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1rem; margin: 0;"><i class="fas fa-receipt" style="color: var(--primary); opacity: 0.8;"></i> Recent Collections</h3>
+            <a href="all_receipts.php" style="color: var(--primary); font-size: 0.75rem; font-weight: 800; text-decoration: none; border-bottom: 2px solid transparent; transition: 0.2s;" onmouseover="this.style.borderBottomColor='var(--primary)'" onmouseout="this.style.borderBottomColor='transparent'">VIEW LOGS</a>
         </div>
         <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Receipt</th>
-                        <th>Student</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
+            <table style="width: 100%;">
                 <tbody>
                     <?php
 $stmt = $pdo->prepare("SELECT f.*, s.name as student_name FROM fees f JOIN students s ON f.student_id = s.id WHERE f.institute_id = ? ORDER BY f.created_at DESC LIMIT 5");
@@ -68,14 +61,17 @@ $recent_fees = $stmt->fetchAll();
 if ($recent_fees):
     foreach ($recent_fees as $fee): ?>
                         <tr>
-                            <td>#<?php echo $fee['receipt_no']; ?></td>
-                            <td><strong><?php echo $fee['student_name']; ?></strong><br><small style="color: var(--secondary);"><?php echo date('d M', strtotime($fee['payment_date'])); ?></small></td>
-                            <td style="color: var(--success); font-weight: 700;">₹<?php echo number_format($fee['amount'], 0); ?></td>
+                            <td style="padding: 0.6rem 0.5rem;"><span style="font-family: monospace; font-weight: 700; color: var(--secondary); font-size: 0.8rem;">#<?php echo $fee['receipt_no']; ?></span></td>
+                            <td style="padding: 0.6rem 0.5rem;">
+                                <div style="font-weight: 700; font-size: 0.85rem;"><?php echo $fee['student_name']; ?></div>
+                                <div style="font-size: 0.7rem; color: #94a3b8;"><?php echo date('d M, Y', strtotime($fee['payment_date'])); ?></div>
+                            </td>
+                            <td style="padding: 0.6rem 0.5rem; text-align: right; color: var(--black); font-weight: 900;">₹<?php echo number_format($fee['amount'], 0); ?></td>
                         </tr>
                     <?php
     endforeach;
 else: ?>
-                        <tr><td colspan="3" style="text-align: center; padding: 2rem;">No recent activity.</td></tr>
+                        <tr><td colspan="3" style="text-align: center; padding: 2rem; color: var(--secondary);">No transactions recorded.</td></tr>
                     <?php
 endif; ?>
                 </tbody>
@@ -83,12 +79,21 @@ endif; ?>
         </div>
     </div>
 
-    <div class="glass-card" style="padding: 1.5rem;">
-        <h3><i class="fas fa-star" style="opacity: 0.5;"></i> Shortcuts</h3>
-        <div style="display: grid; gap: 1rem; margin-top: 1.5rem;">
-            <a href="students.php" class="btn btn-primary" style="background: var(--dark); border-radius: 1rem;"><i class="fas fa-plus-circle"></i> New Registration</a>
-            <a href="collect_fee.php" class="btn btn-primary" style="border-radius: 1rem;"><i class="fas fa-indian-rupee-sign"></i> Collect Payment</a>
-            <a href="profile.php" class="btn btn-secondary" style="background: white; border: 1px solid #e2e8f0; color: var(--dark); border-radius: 1rem;"><i class="fas fa-sliders"></i> App Settings</a>
+    <div class="glass-card" style="padding: 1.25rem;">
+        <h3 style="font-size: 1rem; margin-bottom: 1.25rem;"><i class="fas fa-bolt" style="color: #f59e0b;"></i> Quick Actions</h3>
+        <div style="display: grid; gap: 0.75rem;">
+            <a href="students.php" class="nav-link" style="background: var(--light); color: var(--dark); padding: 1rem; border-radius: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; border: 1px solid #e2e8f0;">
+                <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: var(--shadow-sm);"><i class="fas fa-user-plus"></i></div>
+                Register Student
+            </a>
+            <a href="collect_fee.php" class="nav-link" style="background: var(--light); color: var(--dark); padding: 1rem; border-radius: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; border: 1px solid #e2e8f0;">
+                <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #10b981; box-shadow: var(--shadow-sm);"><i class="fas fa-indian-rupee-sign"></i></div>
+                Collect Fee
+            </a>
+            <a href="profile.php" class="nav-link" style="background: var(--light); color: var(--dark); padding: 1rem; border-radius: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; border: 1px solid #e2e8f0;">
+                <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--secondary); box-shadow: var(--shadow-sm);"><i class="fas fa-cog"></i></div>
+                System Settings
+            </a>
         </div>
     </div>
 </div>

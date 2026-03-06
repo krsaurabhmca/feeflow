@@ -8,7 +8,6 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
     $name = $_POST['name'];
-    $inst_code = strtoupper(trim($_POST['inst_code']));
     $phone = $_POST['phone'];
     $address = $_POST['address'];
     $qr_link = $_POST['qr_payment_link'];
@@ -27,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE institutes SET name = ?, inst_code = ?, phone = ?, address = ?, qr_payment_link = ?, logo = ?, tnc = ?, receipt_color = ?, signature_data = ? WHERE id = ?");
-    if ($stmt->execute([$name, $inst_code, $phone, $address, $qr_link, $logo_name, $tnc, $receipt_color, $signature_data, $institute_id])) {
+    $stmt = $pdo->prepare("UPDATE institutes SET name = ?, phone = ?, address = ?, qr_payment_link = ?, logo = ?, tnc = ?, receipt_color = ?, signature_data = ? WHERE id = ?");
+    if ($stmt->execute([$name, $phone, $address, $qr_link, $logo_name, $tnc, $receipt_color, $signature_data, $institute_id])) {
         $_SESSION['institute_name'] = $name;
         $message = "Settings updated successfully!";
     }
@@ -74,10 +73,6 @@ endif; ?>
                     <input type="text" name="name" class="form-control" value="<?php echo $profile['name']; ?>" required>
                 </div>
                 <div class="form-group">
-                    <label>Institute Code (Prefix for Receipts)</label>
-                    <input type="text" name="inst_code" class="form-control" value="<?php echo $profile['inst_code']; ?>" placeholder="e.g. SKY">
-                </div>
-                <div class="form-group">
                     <label>Contact Phone</label>
                     <input type="text" name="phone" class="form-control" value="<?php echo $profile['phone']; ?>">
                 </div>
@@ -91,10 +86,10 @@ endif; ?>
             <div class="glass-card" style="padding: 2rem;">
                 <h3><i class="fas fa-file-invoice"></i> Receipt Settings</h3>
                 <div class="form-group">
-                    <label>Receipt Theme Color</label>
+                    <label>App & Receipt Theme Color</label>
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="color" name="receipt_color" class="form-control" style="width: 100px; height: 45px; padding: 2px;" value="<?php echo $profile['receipt_color'] ?: '#6366f1'; ?>">
-                        <span style="font-size: 0.8rem; color: var(--secondary);">Color used in PDF & Prints</span>
+                        <input type="color" name="receipt_color" class="form-control" style="width: 100px; height: 45px; padding: 2px;" value="<?php echo $profile['receipt_color'] ?: '#dc2626'; ?>">
+                        <span style="font-size: 0.8rem; color: var(--secondary);">Applies to entire dashboard & receipts</span>
                     </div>
                 </div>
                 

@@ -14,6 +14,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title ?? 'Dashboard'; ?> - FeeFlow</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <?php
+$inst_id = get_institute_id();
+$stmt = $pdo->prepare("SELECT receipt_color FROM institutes WHERE id = ?");
+$stmt->execute([$inst_id]);
+$theme_color = $stmt->fetchColumn() ?: '#dc2626';
+?>
+    <style>
+        :root {
+            --primary: <?php echo $theme_color; ?>;
+            --primary-hover: <?php echo $theme_color; ?>ee;
+        }
+    </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -24,8 +36,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="sidebar-logo">
                 <i class="fas fa-wallet" style="color: var(--primary);"></i> FeeFlow
             </div>
-            <nav style="display: flex; flex-direction: column; height: calc(100vh - 100px); justify-content: space-between;">
-                <div>
+            <nav style="flex: 1; display: flex; flex-direction: column;">
+                <div style="flex: 1;">
                     <a href="dashboard.php" class="nav-link <?php echo $current_page == 'dashboard.php' ? 'active' : ''; ?>">
                         <i class="fas fa-home"></i> Home
                     </a>
@@ -50,10 +62,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a href="profile.php" class="nav-link <?php echo $current_page == 'profile.php' ? 'active' : ''; ?>">
                         <i class="fas fa-sliders-h"></i> Settings
                     </a>
+                    <a href="help.php" class="nav-link <?php echo $current_page == 'help.php' ? 'active' : ''; ?>">
+                        <i class="fas fa-circle-question"></i> Help Guide
+                    </a>
                 </div>
-                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; margin-bottom: 1rem;">
-                    <a href="logout.php" class="nav-link" style="color: #fca5a5;">
-                        <i class="fas fa-power-off"></i> Logout
+                <div style="padding-top: 1rem; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05);">
+                    <a href="logout.php" class="nav-link" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 0.75rem; margin-top: 0.5rem;">
+                        <i class="fas fa-power-off"></i> <strong>Sign Out</strong>
                     </a>
                 </div>
             </nav>
@@ -86,8 +101,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <main class="main-content">
             <header class="header-bar">
                 <h2 class="fade-in"><?php echo $page_title ?? 'Dashboard'; ?></h2>
-                <div class="user-profile glass-card" style="padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <strong><?php echo $_SESSION['institute_name']; ?></strong>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="user-profile glass-card" style="padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-university" style="color: var(--primary);"></i>
+                        <strong><?php echo $_SESSION['institute_name']; ?></strong>
+                    </div>
+                    <a href="logout.php" class="btn btn-secondary" style="padding: 0.5rem 0.75rem; color: #ef4444;" title="Sign Out">
+                        <i class="fas fa-power-off"></i>
+                    </a>
                 </div>
             </header>
             <div class="content-body fade-in">

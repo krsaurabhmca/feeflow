@@ -73,9 +73,13 @@ endif; ?>
                     <td><span style="font-weight: 600; color: var(--black);"><?php echo $student['class_name'] ?: 'No Class'; ?></span></td>
                     <td><i class="fas fa-phone-alt" style="font-size: 0.75rem; color: var(--secondary);"></i> <?php echo $student['phone']; ?></td>
                     <td style="text-align: right;">
-                        <a href="collect_fee.php?student_id=<?php echo $student['id']; ?>" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.75rem;">Pay Fee</a>
-                        <a href="student_ledger.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;"><i class="fas fa-file-lines"></i></a>
-                        <a href="id_card.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;"><i class="fas fa-id-badge"></i></a>
+                        <div style="display: flex; gap: 5px; justify-content: flex-end;">
+                            <a href="collect_fee.php?student_id=<?php echo $student['id']; ?>" class="btn btn-primary" style="padding: 5px 12px; font-size: 0.75rem;">Pay</a>
+                            <a href="edit_student.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" title="Edit"><i class="fas fa-edit"></i></a>
+                            <a href="student_ledger.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" title="Ledger"><i class="fas fa-file-lines"></i></a>
+                            <a href="id_card.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" title="ID Card"><i class="fas fa-id-badge"></i></a>
+                            <a href="delete_student.php?id=<?php echo $student['id']; ?>" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem; color: var(--danger);" title="Delete" onclick="return confirm('Delete this student?')"><i class="fas fa-trash-can"></i></a>
+                        </div>
                     </td>
                 </tr>
             <?php

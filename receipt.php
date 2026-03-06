@@ -58,7 +58,12 @@ $primary_color = $fee['receipt_color'] ?: '#6366f1';
         
         /* Layouts */
         .a4-full { width: 210mm; min-height: 297mm; padding: 60px; }
-        .a4-half { width: 210mm; height: 148.5mm; padding: 40px; margin-bottom: 5mm; border-bottom: 1px dashed #ccc; }
+        .a4-half { width: 210mm; height: 144mm; padding: 30px 40px; margin-bottom: 5mm; border-bottom: 1px dashed #ccc; }
+        
+        .a4-half .header { margin-bottom: 20px; padding-bottom: 15px; }
+        .a4-half .info-grid { margin-bottom: 20px; gap: 20px; }
+        .a4-half .table { margin-bottom: 20px; }
+        .a4-half .footer-grid { margin-top: 20px; gap: 30px; }
         
         .header { display: flex; justify-content: space-between; border-bottom: 3px solid var(--p); padding-bottom: 25px; margin-bottom: 30px; gap: 20px; }
         .logo-box { flex: 1; max-width: 70%; } /* Added flex to handle long names */
@@ -187,15 +192,30 @@ for ($i = 0; $i < $iterations; $i++):
                 <strong>Terms & Conditions:</strong><br>
                 <?php echo nl2br($fee['tnc'] ?: "1. This is a computer generated receipt.\n2. Fees once paid are non-refundable."); ?>
                 
-                <?php if ($fee['inst_upi']):
-        $upi_link = "upi://pay?pa=" . $fee['inst_upi'] . "&pn=" . urlencode($fee['inst_name']) . "&tn=" . urlencode("Fees for " . $fee['student_name']);
-        $qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($upi_link);
+                <!-- Verification QR -->
+                <?php
+    $verify_data = BASE_URL . "student_ledger.php?id=" . $fee['student_id'];
+    $v_qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($verify_data);
 ?>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px; padding: 10px; border: 1px dashed var(--p); border-radius: 8px; width: fit-content;">
-                    <img src="<?php echo $qr_url; ?>" width="60" alt="Payment QR">
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px; padding: 10px; background: #f8fafc; border-radius: 8px; width: fit-content;">
+                    <img src="<?php echo $v_qr_url; ?>" width="55" alt="Verify QR">
                     <div>
-                        <strong style="font-size: 0.75rem; color: var(--p);">SCAN TO PAY UPI</strong><br>
-                        <small style="font-size: 0.65rem; color: #64748b;"><?php echo $fee['inst_upi']; ?></small>
+                        <strong style="font-size: 0.7rem; color: var(--dark);">VERIFY RECEIPT</strong><br>
+                        <small style="font-size: 0.6rem; color: var(--secondary);">Scan to view digital ledger</small>
+                    </div>
+                </div>
+
+                <!-- Payment QR (Optional) -->
+                <?php if ($fee['inst_upi']):
+        $upi_id = trim($fee['inst_upi']);
+        $upi_link = "upi://pay?pa=" . $upi_id . "&pn=" . urlencode($fee['inst_name']) . "&tn=" . urlencode("Fees for " . $fee['student_name']);
+        $p_qr_url = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" . urlencode($upi_link);
+?>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px; border: 1px dashed var(--p); border-radius: 8px; width: fit-content;">
+                    <img src="<?php echo $p_qr_url; ?>" width="55" alt="Payment QR">
+                    <div>
+                        <strong style="font-size: 0.7rem; color: var(--p);">PAYMENT SCANNER</strong><br>
+                        <small style="font-size: 0.6rem; color: var(--secondary);"><?php echo $upi_id; ?></small>
                     </div>
                 </div>
                 <?php

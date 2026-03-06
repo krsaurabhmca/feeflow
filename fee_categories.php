@@ -65,9 +65,14 @@ endif; ?>
                             <td><strong><?php echo $cat['category_name']; ?></strong></td>
                             <td style="text-align: right; color: var(--black); font-weight: 700;">₹<?php echo number_format($cat['default_amount'], 2); ?></td>
                             <td style="text-align: center;">
-                                <a href="delete_category.php?id=<?php echo $cat['id']; ?>" class="btn-secondary" style="padding: 5px 10px; border-radius: 6px; color: var(--danger); text-decoration: none;" onclick="return confirm('Delete this category?')">
-                                    <i class="fas fa-trash-can"></i>
-                                </a>
+                                <div style="display: flex; gap: 8px; justify-content: center;">
+                                    <a href="edit_category.php?id=<?php echo $cat['id']; ?>" class="btn-secondary" style="padding: 5px 10px; border-radius: 6px; color: var(--primary); text-decoration: none;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="delete_category.php?id=<?php echo $cat['id']; ?>" class="btn-secondary" style="padding: 5px 10px; border-radius: 6px; color: var(--danger); text-decoration: none;" onclick="return confirm('Delete this category?')">
+                                        <i class="fas fa-trash-can"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     <?php
