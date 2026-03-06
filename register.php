@@ -77,7 +77,7 @@ endif; ?>
                 <button type="submit" class="btn btn-primary btn-block">Create Account</button>
             </form>
             <p style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem;">
-                Already have an account? <a href="index.php" style="color: var(--primary); font-weight: 600;">Login</a>
+                Already have an account? <a href="login.php" style="color: var(--primary); font-weight: 600;">Login</a>
             </p>
         </div>
     </div>

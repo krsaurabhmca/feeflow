@@ -2,7 +2,7 @@
 // templates/header.php
 require_once 'includes/config.php';
 if (!is_logged_in()) {
-    redirect('index.php');
+    redirect('login.php');
 }
 
 $current_page = basename($_SERVER['PHP_SELF']);
