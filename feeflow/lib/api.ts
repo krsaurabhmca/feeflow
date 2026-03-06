@@ -67,3 +67,19 @@ export const addCategory = async (data: any) => {
     return response.data;
 };
 
+export const register = async (data: any) => {
+    const response = await api.post('register.php', data);
+    return response.data;
+};
+
+export const addClass = async (data: any) => {
+    const response = await api.post('classes.php', data);
+    return response.data;
+};
+
+export const addStudent = async (data: any) => {
+    const response = await api.post('students.php', data);
+    return response.data;
+};
+
+

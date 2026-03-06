@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, Alert, ActivityIndicator, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getStudents, getClasses, collectFee } from '../../lib/api';
+import { getStudents, getClasses, collectFee, getCategories } from '../../lib/api';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
@@ -10,11 +10,19 @@ export default function CollectFeeScreen() {
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [amount, setAmount] = useState('');
     const [remarks, setRemarks] = useState('');
+    const [categories, setCategories] = useState<any[]>([]);
+    const [selectedCat, setSelectedCat] = useState<string | null>(null);
     const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
     const [paymentMethod, setPaymentMethod] = useState('Cash');
     const [customFeeName, setCustomFeeName] = useState('');
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        getCategories().then(res => {
+            if (res.status) setCategories(res.data);
+        });
+    }, []);
 
     const searchStudents = async (query: string) => {
         setSearch(query);
@@ -38,6 +46,7 @@ export default function CollectFeeScreen() {
                 student_id: selectedStudent.id,
                 amount: parseFloat(amount),
                 remarks: remarks,
+                fee_category_id: selectedCat,
                 payment_date: paymentDate,
                 payment_method: paymentMethod,
                 custom_fee_name: customFeeName
@@ -151,7 +160,25 @@ export default function CollectFeeScreen() {
                     keyboardType="numeric"
                 />
 
-                <Text style={styles.label}>Fee Name / Type</Text>
+                <Text style={styles.label}>Fee Category</Text>
+                <View style={styles.classGrid}>
+                    {categories.map((c) => (
+                        <TouchableOpacity
+                            key={c.id}
+                            style={[styles.classItem, selectedCat === c.id.toString() && styles.classSelected]}
+                            onPress={() => {
+                                setSelectedCat(c.id.toString());
+                                if (!customFeeName) setCustomFeeName(c.category_name);
+                            }}
+                        >
+                            <Text style={[styles.classText, selectedCat === c.id.toString() && styles.classTextSelected]}>
+                                {c.category_name}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+
+                <Text style={styles.label}>Custom Fee Name (Optional)</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="e.g. Admission Fee, Monthly Fee"
@@ -287,4 +314,30 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         fontSize: 16,
     },
+    classGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    classItem: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        backgroundColor: '#f1f5f9',
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
+    },
+    classSelected: {
+        backgroundColor: '#dc2626',
+        borderColor: '#dc2626',
+    },
+    classText: {
+        color: '#475569',
+        fontWeight: '600',
+        fontSize: 12,
+    },
+    classTextSelected: {
+        color: '#fff',
+    },
 });
+

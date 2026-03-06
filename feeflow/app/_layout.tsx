@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { View, ActivityIndicator } from 'react-native';
@@ -32,8 +32,8 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="login" options={{ title: 'Login' }} />
-      <Stack.Screen name="(tabs)" options={{ title: 'Home' }} />
+      <Stack.Screen name="login" />
+      <Stack.Screen name="(tabs)" />
     </Stack>
   );
 }

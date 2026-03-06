@@ -73,7 +73,15 @@ export default function StudentsScreen() {
                     ListEmptyComponent={<Text style={styles.emptyText}>No students found</Text>}
                 />
             )}
+
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={() => router.push('/add-student')}
+            >
+                <Ionicons name="person-add" size={24} color="white" />
+            </TouchableOpacity>
         </View>
+
     );
 }
 
@@ -146,5 +154,22 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#94a3b8',
         marginTop: 20,
+    },
+    fab: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#dc2626',
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     }
 });
+

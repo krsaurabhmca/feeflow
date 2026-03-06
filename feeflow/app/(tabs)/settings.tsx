@@ -58,7 +58,12 @@ export default function SettingsScreen() {
                 </View>
                 <Text style={styles.instName}>{instName}</Text>
                 <Text style={styles.adminTag}>Administrator</Text>
+                <TouchableOpacity style={styles.manageBtn} onPress={() => router.push('/manage-classes')}>
+                    <Ionicons name="school-outline" size={16} color="#dc2626" />
+                    <Text style={styles.manageBtnText}>Manage Classes / Courses</Text>
+                </TouchableOpacity>
             </View>
+
 
             <View style={styles.menu}>
                 <Text style={styles.sectionLabel}>Fee Categories</Text>
@@ -124,6 +129,23 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#64748b',
         marginTop: 2,
+    },
+    manageBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 15,
+        backgroundColor: '#fff1f2',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#fecdd3',
+    },
+    manageBtnText: {
+        color: '#dc2626',
+        fontWeight: '700',
+        fontSize: 12,
+        marginLeft: 8,
     },
     menu: {
         marginTop: 20,
