@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert,
 import { useRouter, Stack, useLocalSearchParams } from 'expo-router';
 import { getClasses, updateStudent, getStudents } from '../lib/api';
 import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function EditStudentScreen() {
     const { id } = useLocalSearchParams();
@@ -76,7 +77,7 @@ export default function EditStudentScreen() {
     if (loading) return <ActivityIndicator size="large" color="#dc2626" style={{ marginTop: 50 }} />;
 
     return (
-        <ScrollView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['left', 'top', 'right']}   >
             <Stack.Screen options={{ title: 'Edit Student', headerShown: true }} />
 
             <View style={styles.form}>
@@ -156,7 +157,7 @@ export default function EditStudentScreen() {
                     )}
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+        </SafeAreaView>
     );
 }
 

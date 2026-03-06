@@ -39,7 +39,7 @@ export default function StudentDetailsScreen() {
     if (loading) return <ActivityIndicator size="large" color="#dc2626" style={{ marginTop: 50 }} />;
 
     return (
-        <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+        <SafeAreaView style={styles.container} edges={['left', 'top', 'right']}>
             <Stack.Screen options={{
                 title: 'Student Profile',
                 headerShown: true,
