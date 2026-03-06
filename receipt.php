@@ -179,6 +179,7 @@ $primary_color = $fee['receipt_color'] ?: '#003366'; // Defaulting to a deep aca
             <a href="collect_fee.php" class="btn btn-secondary">New Collection</a>
             <a href="reports.php" class="btn btn-secondary">All Receipts</a>
         </div>
+        <br>
         <div style="font-size: 12px; color: #666;">
             <b>Tip:</b> Set layout to Portrait and remove headers/footers in print settings.
         </div>
@@ -274,9 +275,10 @@ endif; ?>
             <!-- Final Footer Section -->
             <div class="final-footer">
                 <div class="qr-box">
-                    <?php
+                   <?php
 $verify_data = BASE_URL . "student_ledger.php?id=" . $fee['student_id'];
-$v_qr_url = "https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=" . urlencode($verify_data);
+
+$v_qr_url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . urlencode($verify_data);
 ?>
                     <img src="<?php echo $v_qr_url; ?>" alt="Verify QR">
                     <p>Scan to Verify Receipt</p>
